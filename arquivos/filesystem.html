@@ -1,0 +1,221 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+
+<!-- Mirrored from f3l1p3.neocities.org/arquivos/filesystem by HTTrack Website Copier/3.x [XR&CO'2014], Sun, 05 Oct 2025 19:28:14 GMT -->
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>FileSystem - Sistema de Ficheiros</title>
+    <link href="../favicon.ico" rel="icon" type="image/x-icon" />
+    <link id="theme-stylesheet" href="../assets/nostalgic.css" rel="stylesheet" type="text/css" media="all">
+</head>
+
+<body>
+
+    <input type="checkbox" id="theme-toggle" style="display: none;"/>
+
+    <div class="site-wrapper">
+
+        <header class="site-header">
+            <h1 class="main-title">FileSystem (Sistema de Ficheiros)</h1>
+            <p class="subtitle">Organizando os Dados no Disco</p>
+        </header>
+
+        <nav class='menu-bar'>
+            <div class="menu-item"><a href="../index.html">[MENU]</a></div>
+            <div class="menu-item"><a href="../sobre.html">[Sobre o FEP]</a></div>
+            <div class="menu-item"><a href="arquivos.html">[Arquivos]</a></div>
+            <div class="menu-item"><a href="../ezines/ezines.html">[Ezines]</a></div>
+            <div class="menu-item"><a href="../links.html">[Sites Interessantes]</a></div>
+            <div class="menu-item theme-switcher">
+                <label for="theme-toggle" style="cursor: pointer;">[MODO VISUAL]</label>
+            </div>
+        </nav>
+
+        <main class="content-area">
+
+            <section class="box">
+                <h2 class="section-title">Índice</h2>
+                <ul>
+                    <li><a href='#FileSystem O que são?'>FileSystem O que são?</a></li>
+                    <li><a href='#Formatação Física'>Formatação Física</a></li>
+                    <li><a href='#Badblocks'>Badblocks</a></li>
+                    <li><a href='#Formatação Lógica'>Formatação Lógica</a></li>
+                    <li><a href='#O sistema de arquivos FAT'>O sistema de arquivos FAT</a></li>
+                    <li><a href='#FAT-12'>FAT-12</a></li>
+                    <li><a href='#FAT-16'>FAT-16</a></li>
+                    <li><a href='#FAT-32'>FAT-32</a></li>
+                    <li><a href='#exFAT'>exFAT</a></li>
+                    <li><a href='#VFAT'>VFAT</a></li>
+                </ul>
+            </section>
+
+            <section id='FileSystem O que são?' class='box'>
+                <h2 class="section-title">FileSystem O que são?</h2>
+                <p>Memória de massa ou memória auxiliar é o nome de dispositivos que armazenam dados para uso posterior.</p>
+                <p>Dados são armazenados em forma de arquivos.</p>
+            </section>
+
+            <section id='Formatação Física' class='box'>
+                <h2 class="section-title">Formatação Física</h2>
+                <p>Um disco é dividido em pequenas porções chamadas setores que cabem 512 bytes de info cada.</p>
+                <p>Um disco rígido possui vários discos, cada face de disco é dividida em círculos concêntricos chamados cilindros ou trilhas.</p>
+                <p>Em cada trilha temos X setores.</p>
+                <p>Qtd de setores de um hd: N de faces(chamados de cabeça) X N de trilhas(cilindros) X N de setores por trilhas.</p>
+                <p>Capacidade de armazenamento: N de setores X 512 bytes</p>
+            </section>
+
+            <section id='Badblocks' class='box'>
+                <h2 class="section-title">Badblocks</h2>
+                <p>Nenhuma mídia magnética é totalmente confiável, falhas na superfície da mídia,interferência eletromagnética, raios,  variação de tensão podem levar a erros de leitura.</p>
+                <p>Por isso os fabricantes utilizam sistemas de ECC(Error Correction Check) também conhecido como memórias registradoras para detectar e corrigir erros de leitura eventualmente encontrados.</p>
+                <p>Como funciona, além dos 512 bytes de dados mais algumas dezenas de bytes contendo os códigos ECC é armazenado nos setores.</p>
+                <p>Quando é lido um setor, juntamente é lido parte do ECC que verifica se os dados lidos são os mesmos que foram gravados.</p>
+                <p>Esses erros transitórios são chamados de <strong>soft errors</strong>.</p>
+                <p>Os defeitos físicos no disco são chamados de badblocks. Em hd's mais atuais existe uma parte no inicio do disco reservada para (defect map), essa area mapeia badblocks e retira de uso os setores danificados colocando outros.</p>
+                <p>Para identificar os badblocks existem tools como o scandisk(win) e o badblocks(nix).</p>
+            </section>
+
+            <section id='Formatação Lógica' class='box'>
+                <h2 class="section-title">Formatação Lógica</h2>
+                <p>Feita via softwares, adiciona as estruturas utilizadas pelo sistema operacional é o famoso sistema de arquivos(file system).</p>
+                <p>O FS(file system) pode ser definido como o conjunto de estruturas lógicas que permitem ao sistema operacional organizar e otimizar o acesso a um disco.</p>
+                <p>Existem diversos sistemas de arquivos diferentes, que vão desde sistemas simples como o FAT16, que utilizamos em cartões de memória, até sistemas como o NTFS, EXT3 e ReiserFS, que incorporam recursos muito mais avançados.</p>
+                <p>A primeira parte da formatação é o particionamento, onde você define em quantas partições o disco será dividido e o tamanho de cada uma.</p>
+                <p>Podemos ter um total de 4 partições primárias ou três partições primárias e mais uma partição estendida, que pode englobar até 255 partições lógicas.</p>
+                <p>É justamente a partição lógica que permite dividir o HD em mais de 4 partições.</p>
+                <p>Esta limitação das 4 partições primárias é uma limitação que existe desde o primeiro PC, lançado em 1981.</p>
+                <p>Os projetistas que escreveram o BIOS para ele precisavam economizar memória e chegaram à conclusão que 2 bits (4 combinações) para o endereço das partições seriam suficientes, pois na época os HDs mais vendidos tinham apenas 5 MB e só existia um sistema operacional para PCs (o MS-DOS), de forma que era raro alguém precisar criar mais de uma partição.</p>
+                <p>Para amenizar o problema, foi adicionada a possibilidade de criar partições lógicas.</p>
+                <p>Em vez de criar 4 partições primárias e ficar sem endereços para criar novas partições, você cria uma <strong>partição estendida</strong>,  que é uma espécie de container, que permite criar mais partições.</p>
+                <p>A partição estendida contém uma área extra de endereçamento, que permite endereçar as 255 partições lógicas.</p>
+                <p>É possível criar até 4 partições estendidas, de forma que (em teoria) é possível dividir o HD em até 1020 partições.</p>
+                <p>Tools de particionamento de disco PartitionMagic(win) e Gparted(nix).</p>
+                <p>No mundo Windows, temos apenas três sistemas de arquivos: FAT16, FAT32 e NTFS.</p>
+                <p>O FAT16 é o mais antigo, usado desde os tempos do MS-DOS, enquanto o NTFS é o mais complexo e atual.</p>
+                <p>Apesar disso, temos uma variedade muito grande de sistemas de arquivos diferentes no Linux (e outros sistemas Unix), que incluem o EXT2, EXT3, ReiserFS, XFS, JFS e muitos outros.</p>
+                <p>Os FS são constituídos de um conjunto de estruturas lógicas, que permitem ao sistema operacional organizar os dados gravados e acessá-los com a maior velocidade e confiabilidade possíveis.</p>
+                <p>O setor de boot(MBR) ou trilha zero, contém dois componentes principais. O primeiro é um bootstrap, o software responsável por iniciar o carregamento do sistema operacional.</p>
+                <p>É utilizado um gerenciador de boot, como o NTLDR(WIN) ou o Grub (NIX). Ele mostrar uma lista com os sistemas operacionais instalados no início do boot e carregar o sistema escolhido.</p>
+                <p>Começa com o setor de boot, que é lido pelo BIOS da placa-mãe no início do boot, logo após a contagem de memória e outros procedimentos padrões.</p>
+                <p>O bootstrap ocupa os primeiros 446 bytes do MBR. Os 66 bytes restantes são usados para armazenar a tabela de partições, que guarda informações sobre onde cada partição começa e termina.</p>
+                <p>Alguns vírus, além de acidentes em geral, podem danificar os dados armazenados na tabela de partição, fazendo com que pareça que o HD foi formatado. Mas, na maioria dos casos, os dados continuam lá, intactos, e podem ser recuperados.</p>
+            </section>
+
+            <section id='O sistema de arquivos FAT' class='box'>
+                <h2 class="section-title">O sistema de arquivos FAT</h2>
+                <p>O File Allocation Table(FAT) é um sistema de arquivos criados em 1977 projetado inicialmente para disquetes.</p>
+                <p>Logo após adaptado para hd no MS-DOS e Win9X. Ainda se encontra bastante em pendrives e cartões de memória.</p>
+                <p>Nesse fs(file system) existe uma tabela de alocação de arquivos aonde é mapeado a utilização do disco e gravado aonde esta armazenado no disco cada arquivo.</p>
+                <p>Cada vez que um novo arquivo é gravado ou apagado, o sistema operacional altera a FAT, mantendo-a sempre atualizada.</p>
+                <p>A FAT é tão importante que, além da tabela principal, é armazenada também uma cópia de segurança, que é usada sempre que a tabela principal é danificada de alguma maneira.</p>
+                <p>Após tem o diretório raiz que ocupa mais alguns setores no disco.</p>
+                <p>Cada arquivo ou diretório do hd possui uma entrada no dir raiz, com o nome do arquivo, a extensão, a data de quando foi criado ou quando foi feita a última modificação, o tamanho em bytes e o número do cluster onde o arquivo começa.</p>
+                <p>Um arquivo pequeno pode ser armazenado em um único cluster, enquanto um arquivo grande é “quebrado” e armazenado ocupando vários clusters.</p>
+                <p>Nesse caso, haverá no final de cada cluster uma marcação, indicando o próximo cluster ocupado pelo file.</p>
+                <p>No último cluster ocupado, temos um código que marca o fim do arquivo.</p>
+                <p>Quando um arquivo é deletado, simplesmente é removida sua entrada no dir raiz, fazendo com que os clusters ocupados por ele pareçam vagos para o sistema operacional.</p>
+                <p>Ao gravar um novo arquivo no disco, o sistema simplesmente procura o primeiro setor livre, continuando a gravá-lo nos setores livres seguintes, mesmo que estejam muito distantes uns dos outros.</p>
+                <p>Surge então o problema da fragmentação, que reduz consideravelmente a velocidade de acesso, já que dados espalhados significam mais movimentos da cabeça de leitura.</p>
+                <p>Ao contrário de outros sistemas de arquivos mais modernos, o sistema FAT não possui nenhum mecanismo que impeça, ou pelo menos diminua a fragmentação, daí a necessidade de rodar o defrag ou outro programa desfragmentador periodicamente.</p>
+                <p>A função deles é mover os arquivos, de forma que eles fiquem gravados em clusters sequenciais.</p>
+                <p>Além do nome, cada arquivo recebe também uma extensão de até três caracteres, como “EXE”, “DOC”, etc.</p>
+                <p>Através da extensão, o s.o sabe que um determinado arquivo deve ser executado ou aberto de certa maneira.</p>
+                <p>Depois da extensão, existe mais um byte reservado para o atributo do arquivo, que pode ser “somente leitura”, “oculto”, “sistema”, “volume label”, “diretório” ou “arquivo”.</p>
+                <p>O atributo permite instruir o s.o e demais aplicativos sobre como lidar com o arquivo.</p>
+                <p>O atributo "somente leitura" indica que o arquivo não deve ser modificado ou deletado.</p>
+                <p>Se você tentar deletar ou modificar um arquivo somente leitura pelo DOS, receberá a mensagem “Access Denied”.</p>
+                <p>Tentando apagar o arquivo através do Windows Explorer você receberá um aviso explicando que o arquivo é somente para leitura, perguntando se você tem certeza que deseja deletá-lo.</p>
+                <p>O atributo "sistema" possui uma função parecida, indicando apenas que, além de ser oculto, o arquivo é utilizado pelo sistema operacional.</p>
+                <p>Por padrão, o Win não mostra arquivos marcados com o atributo "sistema", nem os arquivos ocultos.</p>
+                <p>É necessário configurar o Windows Explorer para exibi-los. Uma opção é usar o comando "DIR /AH" .</p>
+                <p>Para nomear um disquete ou a uma partição de um hd, usamos o atributo "volume label".</p>
+                <p>O nome dado é armazenado em uma área reservada do diretório raiz.</p>
+                <p>De todos os atributos, o mais importante é o atributo de "diretório", pois ele permite a existência de subpastas.</p>
+                <p>As pastas, mesmo quando vazias, são vistas pelo sistema operacional como arquivos.</p>
+                <p>Dentro desse arquivo ficam armazenadas informações sobre o nome da pasta, atributos como somente leitura, oculto, etc., a posição da pasta na árvore de diretórios (C:\Windows\System, por exemplo) e informações sobre quais arquivos ou subpastas estão guardados dentro dela, assim como a localização destes arquivos no disco.</p>
+                <p>Como o diretório raiz ocupa (no sistema FAT) um espaço equivalente a apenas 16 KB no disco rígido (32 setores), podemos ter apenas 512 entradas de arquivos ou diretórios.</p>
+                <p>Cada sub-pasta funciona mais ou menos como um novo diretório raiz, permitindo que tenhamos mais arquivos no disco.</p>
+                <p>Como uma pasta (que nada mais é do que um arquivo, marcado com o atributo especial) pode ocupar o espaço que quiser, não temos a limitação de 512 arquivos, como no diretório raiz.</p>
+                <p>Qualquer arquivo com o atributo "diretório", passa a ser visto pelo sistema operacional como uma pasta, mas a tentativa de transformar um arquivo qualquer em pasta não daria certo pois, apesar de, em essência, as pastas também serem arquivos, elas possuem um formato específico.</p>
+                <p>Uma curiosidade sobre as subpastas é que elas só passaram a ser suportadas a partir da versão 2.0 do DOS.</p>
+                <p>Os usuários do DOS 1.0 tiveram que conviver durante algum tempo com um sistema que permitia armazenar arquivos apenas no diretório raiz, com a consequente limitação de 512 arquivos no HD.</p>
+                <p>Finalizando, o atributo "arquivo" é usado com relação a arquivos que raramente são modificados, ou que são cópias de backup de outros arquivos.</p>
+                <p>Muitos programas de backup verificam este atributo quando fazem um backup incremental (quando são salvos apenas os arquivos que foram alterados desde o último backup).</p>
+                <p>Nesse caso, o programa de backup retira o atributo após salvar o arquivo.</p>
+                <p>Ao ser alterado por algum outro programa, o arquivo novamente recebe o atributo, permitindo ao programa de backup saber quais arquivos foram modificados.</p>
+                <p>Para alterar os atributos pode-se utilizar o comando ATTRIB.</p>
+                <p>Ref:</p>
+                <pre class="code-block"><code>https://digital-forensics.sans.org/blog/2009/06/30/fried-fat-fat-directory-entries-and-the-fat
+https://en.wikipedia.org/wiki/Design_of_the_FAT_file_system
+https://www.forensicswiki.org/wiki/FAT
+https://en.wikipedia.org/wiki/File_Allocation_Table</code></pre>
+            </section>
+
+            <section id='FAT-12' class='box'>
+                <h2 class="section-title">FAT-12</h2>
+                <p>Utilizado em disquetes e também nas primeiras versões do MS-DOS.</p>
+                <p>São usados endereços de apenas 12 bits para endereçar os clusters, permitindo um total de 4096 clusters de até 4 KB, o que permite partições de até 16 MB.</p>
+                <p>Em 1981, quando o IBM PC foi lançado, 16 MB parecia ser uma capacidade satisfatória, já que naquela época os discos rígidos tinham apenas 5 ou 10 MB.</p>
+            </section>
+
+            <section id='FAT-16' class='box'>
+                <h2 class="section-title">FAT-16</h2>
+                <p>FAT-16 utiliza uma variável de 16 bits(binary digits).</p>
+                <p>Como cada variável é uma posição no disco podemos ter, no máximo, 2 elevado a 16 = 65.536 posições na FAT.</p>
+                <p>1 setor = 512 bytes,logo 65.536 x 512 bytes = 33.554.432 bytes ou 32 MB.</p>
+                <p>Devido ao tamanho reduzido o FAT-16 não trabalha com setor e sim com conjuntos de setores que são unidades de alocação(clusters).</p>
+                <p>Ou seja cada variavel aponta para um cluster:</p>
+                <pre class="code-block"><code>Cluster     Máx. de Armazenamento
+ 2 KB         128 MB
+ 4 KB         256 MB
+ 8 KB         512 MB
+ 16 KB          1 GB
+ 32 KB          2 GB
+ 64 KB          4 GB * exclusivo do win NT (muita perda de espaço)</code></pre>
+                <p>O tamanho do cluster é definido automaticamente pelo seu sistema operacional seguindo a tabela acima.</p>
+                <p>Como a menor unidade de acesso é a do cluster quase vc formate por exemplo seu pendrive de 2gb usando fat-16 e crie um arquivo de 3KB o tamanho salvo no disco será de 32KB causando assim um desperdício gigante de espaço pane conhecida como (slack space).</p>
+            </section>
+
+            <section id='FAT-32' class='box'>
+                <h2 class="section-title">FAT-32</h2>
+                <p>O FATA-32 é a evolução do FAT-16 foi criado após o WIN95, foi incorporado no WIN95 OSR/2 e continuou sendo usado nas versões seguintes.</p>
+                <p>A principal evolução foi o uso de endereços de 32 bits para o endereçamento dos clusters, o que possibilita a criação de partições muito maiores, de até 2 terabytes.</p>
+                <p>O uso de endereços de 32 bits permitem o uso de clusters de 4 KB mesmo em partições muito grandes mas, por questões de desempenho, ficou estabelecido que por default os clusters de 4 KB seriam usados apenas em partições de até 8 GB.</p>
+                <p>Tamanho dos clusters de acordo com o tamanho da partição:</p>
+                <pre class="code-block"><code>Partição    Cluster
+    8 GB        4 KB
+   16 GB        8 KB
+   32 GB       16 KB
+  >32 GB       32 KB</code></pre>
+                <p>Ou seja o FAT-32 desperdiça menos espaço do disco que o fat16 ao converter discos em fat16 para fat32 é possivel diminuir em 20% o tamanho dos dados em média.</p>
+                <p>A maior limitação do sistema FAT32 é o tamanho máximo de um arquivo que não pode passar de 4GB.</p>
+                <p>Ref:</p>
+                <pre class="code-block"><code>https://www.easeus.com/resource/fat32-disk-structure.htm</code></pre>
+            </section>
+
+            <section id='exFAT' class='box'>
+                <h2 class="section-title">exFAT</h2>
+                <p>Extended File Allocation Table, foi criada em 2006 visando suprir a deficiencia do FAT32 aonde só era possivel criar arquivos de no maximo 4 GB.</p>
+                <p>Ref:</p>
+                <pre class="code-block"><code>https://www.sans.org/reading-room/whitepapers/forensics/reverse-engineering-microsoft-exfat-file-system-33274</code></pre>
+            </section>
+
+            <section id='VFAT' class='box'>
+                <h2 class="section-title">VFAT</h2>
+                <p>VFAT (Virtual File Allocation Table), uma extensão incluída a partir do Windows 95 e suportado também no Linux e outros sistemas.</p>
+                <p>Inicialmente, o sistema FAT possuía uma grave limitação quanto ao tamanho dos nomes de arquivos, que não podiam ter mais que 11 caracteres, sendo 8 para o nome do arquivo e mais 3 para a extensão, como em “formular.doc”.</p>
+                <p>O limite de apenas 8 caracteres era um grande inconveniente para os usuários do MS-DOS.</p>
+                <p>Através do VFAT, arquivos com nomes longos são gravados no diretório raiz respeitando o formato 8.3 (oito letras e uma extensão de até 3 caracteres), sendo o nome verdadeiro armazenado numa área reservada.</p>
+                <p>Se tivéssemos dois arquivos, chamados de “Reunião anual de 1998” e “Reunião anual de 1999”, por exemplo, teríamos gravados no diretório raiz “Reunia~1” e “Reunia~2”. Se o disco fosse lido a partir do DOS, o sistema leria apenas este nome simplificado.</p>
+                <p>Lendo o disco através do Windows, é possível acessar as áreas ocultas do VFAT e ver os nomes completos dos arquivos.</p>
+                <p>Isso permitiu que a Microsoft derrubasse a limitação, sem quebrar a compatibilidade com os softwares antigos.</p>
+            </section>
+
+        </main>
+
+    </div> 
+</body>
+
+<!-- Mirrored from f3l1p3.neocities.org/arquivos/filesystem by HTTrack Website Copier/3.x [XR&CO'2014], Sun, 05 Oct 2025 19:28:15 GMT -->
+</html>

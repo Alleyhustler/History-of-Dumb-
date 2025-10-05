@@ -1,0 +1,480 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+
+<!-- Mirrored from f3l1p3.neocities.org/arquivos/dns by HTTrack Website Copier/3.x [XR&CO'2014], Sun, 05 Oct 2025 19:28:16 GMT -->
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>DNS - Domain Name System</title>
+    <link href="../favicon.ico" rel="icon" type="image/x-icon" />
+    <link id="theme-stylesheet" href="../assets/nostalgic.css" rel="stylesheet" type="text/css" media="all">
+</head>
+
+<body>
+
+    <input type="checkbox" id="theme-toggle" style="display: none;"/>
+
+    <div class="site-wrapper">
+
+        <header class="site-header">
+            <h1 class="main-title">DNS (Domain Name System)</h1>
+            <p class="subtitle">A Lista Telefónica da Internet</p>
+        </header>
+
+        <nav class='menu-bar'>
+            <div class="menu-item"><a href="../index.html">[MENU]</a></div>
+            <div class="menu-item"><a href="../sobre.html">[Sobre o FEP]</a></div>
+            <div class="menu-item"><a href="arquivos.html">[Arquivos]</a></div>
+            <div class="menu-item"><a href="../ezines/ezines.html">[Ezines]</a></div>
+            <div class="menu-item"><a href="../links.html">[Sites Interessantes]</a></div>
+            <div class="menu-item theme-switcher">
+                <label for="theme-toggle" style="cursor: pointer;">[MODO VISUAL]</label>
+            </div>
+        </nav>
+
+        <main class="content-area">
+
+            <section class="box">
+                <h2 class="section-title">Índice</h2>
+                <ul>
+                    <li><a href='#Domain Name System(DNS)'>Domain Name System(DNS)</a></li>
+                    <li><a href='#Root-Servers'>Root-Servers</a></li>
+                    <li><a href='#RRs(Registro de Recursos) Comuns'>RRs (Registro de Recursos) Comuns</a></li>
+                    <li><a href='#DIG (Domain Information Groper)'>DIG (Domain Information Groper)</a></li>
+                    <li><a href='#Seções'>Seções do DIG</a></li>
+                    <li><a href='#FLAGS – Recursividade e Autoridade'>FLAGS – Recursividade e Autoridade</a></li>
+                    <li><a href='#STATUS – Tratamento de erro nas consultas'>STATUS – Tratamento de Erro</a></li>
+                    <li><a href='#NSLOOKUP (Name Server Lookup) Desatualizado'>NSLOOKUP (Desatualizado)</a></li>
+                    <li><a href='#HOST'>HOST</a></li>
+                    <li><a href='#DNSTRACER'>DNSTRACER</a></li>
+                    <li><a href='#DNSWALK'>DNSWALK</a></li>
+                    <li><a href='#FIERCE'>FIERCE</a></li>
+                    <li><a href='#Ref:'>Referências</a></li>
+                    <li><a href='#Falta testar:'>Ferramentas para Testar</a></li>
+                </ul>
+            </section>
+
+            <section id='Domain Name System(DNS)' class='box'>
+                <h2 class="section-title">Domain Name System (DNS)</h2>
+                <p>O DNS é um sistema de gerenciamente de nomes hierárquicos distrubuido para qualquer recurso conectado a internet ou a uma rede privada. Simploriamente ele converte ips para domains. Sua porta padrão é a 53.</p>
+                <p>Antes da criaçao do DNS o mapeamento de domains e ips era centralizado e controlado pela Internic (https://www.internic.net/), existia uma arquivo chamado HOSTS.TXT que continha todas as informacoes de todos ips e domains quando havia uma alteração esse arquivo tinha que ser transferido via ftp para todos os outros nós da rede.</p>
+                <p>Esse método foi causando diversos problemas com a evolução da internet pois todas modificaçoes das organizações precisavam aguardar as publicações do arquivo HOSTS.TXT da InterNic para serem efetivadas para todos.</p>
+                <p>A largura da banda necessária para manter essas atualizações tinha que se tornar maior conforme mais nós entravam em operação.</p>
+                <p>Diversas ideais e modelos começaram a ser debatidos tentando consertar esses problemas e assim surgiu o DNS.</p>
+                <p>O DNS é um grande catálogo de informações ou banco de dados hierárquivo e distribuído.</p>
+                <pre class="code-block"><code>Ex:
+
+                                        ROOT
+                                          |
+                      +---------------------+------------------+
+                      |                     |                  |
+                     MIL                   EDU                ARPA
+                      |                     |                  |
+                      |                     |                  |
+                +-----+-----+               |      +------+-----+-----+
+                |     |     |               |      |      |           |
+               BRL   NOSC  DARPA            |   IN-ADDR  SRI-NIC     ACC
+                                            |
+                +--------+------------------+---------------+--------+
+                |        |                  |               |        |
+               UCI      MIT                 |              UDEL     YALE
+                        |                  ISI
+                        |                   |
+                    +---+---+               |
+                    |       |               |
+                   LCS   ACHILLES  +--+-----+-----+--------+
+                    |              |  |     |     |        |
+                    XX             A  C    VAXA VENERA Mockapetris</code></pre>
+                <p>Um domínio representa a posição de um nó dentro da estrutura hierárquica. Sua separação é sempre pelo caracter "." que indica a mudança do nível de hierarquia.</p>
+                <pre class="code-block"><code>Ex:
+        site.com.br 
+
+               ROOT
+                 |
+                 |
+                BR
+                 |
+                COM
+                 |
+                SITE</code></pre>
+                <p>Quando seu navegador precisa resolver um domínio ele envia uma solicitação ao DNS recursivo configurado em seu computador , geralmente é um endereço fornecido pelo seu provedor de navegação(ISP) ou algum serviço de terceiros como por exemplo o GOOGLE DNS (8.8.8.8).</p>
+                <p>O servidor recursivo recebe essa solicitação ae ele fica com duas alternativas ,responder diretamente os dados caso ele já possua em seu cache ou então iniciar uma busca pelo recurso em outros servidores.</p>
+                <p>Caso inicie uma busca pelo recurso em outros servidores entram em ação os "Root-Servers".</p>
+            </section>
+
+            <section id='Root-Servers' class='box'>
+                <h2 class="section-title">Root-Servers</h2>
+                <p>Também chamados de "Servidores Raiz", eles são o conjunto de servidores espalhados globalmente e os responsáveis pela autoridade da "Root Zone" ou "Zona Raiz" – que é a tabela com toda a lista dos TLDs – Top Level Domains ou 'Domínios de Topo'.</p>
+                <p>Na ROOT ZONE contém o próximo nível de delegação na hierarquia de nomes, pois é ela quem guarda a relação de todos os servidores autoritativos para cada um dos TLDs existentes. É esta resposta que permite um servidor de DNS recursivo continuar realizando sucessivas queries até chegar no servidor autoritativo para o domínio procurado.</p>
+                <p>Genericamente, um TLD pode ser entendido como o último termo a direita de um domínio. Ele pode representar, um código de país (ccTLD ou country-code Top Level Domain), com o ".br", ".ca", etc. Também podem ser domínios genéricos (gTLD ou generic Top Level Domain), como o ‘.com’, ‘.sexo’, ‘.edu’.</p>
+                <p>"Root Zone" com a lista completa dos TLDs <a href="https://www.internic.net/domain/root.zone">https://www.internic.net/domain/root.zone</a></p>
+                <p>Os Root-servers são 13 conjuntos de servidores globalmente distribuídos. Diversos desses "clusters" operam em modo "anycast", ou seja, o mesmo grupo compartilha um único endereço IP e os pacotes são entregues ao membro mais próximo da origem.</p>
+                <p>Cada um destes grupos de servidores são nomeados utilizando-se uma letra de 'A' a 'M', seguidos do domínio "root-servers.net".</p>
+                <pre class="code-block"><code>Hostname              IP Addresses                         Manager
+a.root-servers.net    198.41.0.4, 2001:503:ba3e::2:30       VeriSign, Inc.
+b.root-servers.net    192.228.79.201, 2001:500:200::b      University of Southern California
+c.root-servers.net    192.33.4.12, 2001:500:2::c           Cogent Communications
+d.root-servers.net    199.7.91.13, 2001:500:2d::d          University of Maryland
+e.root-servers.net    192.203.230.10, 2001:500:a8::e       NASA (Ames Research Center)
+f.root-servers.net    192.5.5.241, 2001:500:2f::f          Internet Systems Consortium, Inc.
+g.root-servers.net    192.112.36.4, 2001:500:12::d0d       US Department of Defense (NIC)
+h.root-servers.net    198.97.190.53, 2001:500:1::53        US Army (Research Lab)
+i.root-servers.net    192.36.148.17, 2001:7fe::53          Netnod
+j.root-servers.net    192.58.128.30, 2001:503:c27::2:30    VeriSign, Inc.
+k.root-servers.net    193.0.14.129, 2001:7fd::1            RIPE NCC
+l.root-servers.net    199.7.83.42, 2001:500:9f::42         ICANN
+m.root-servers.net    202.12.27.33, 2001:dc3::35           WIDE Project</code></pre>
+                <p>Cada um dos Manager operam de forma independente seus servidores. São elas quem decidem quantos eles serão, em que localidades serão instalados, qual hardware e versão de software utilizado.</p>
+                <p>Já a gestão dos dados da 'Root Zone', que é sincronizada entre todo os servidores, é de responsabilidade da IANA (Internet Assigned Numbers Authority), que é mantida pelo ICANN (Internet Corporation for Assigned Names and Numbers).</p>
+                <p>Uma vez que os "Root-Servers" estão no topo da hierarquia de domínios, eles não podem ser encontrados quando percorremos a própria hierarquia. Portanto, o software de DNS instalado no servidor recursivo é quem traz a lista dos servidores raiz e de seus respectivos endereços.</p>
+                <p>O BIND, por exemplo, tem a seguinte configuração para essa finalidade:</p>
+                <pre class="code-block"><code>zone "." IN {
+  type hint;
+  file "named.ca";
+};</code></pre>
+                <p>O conteúdo deste arquivo é:</p>
+                <pre class="code-block"><code>$ cat /var/named/named.ca 
+;       This file holds the information on root name servers needed to
+;       initialize cache of Internet domain name servers
+;       (e.g. reference this file in the "cache  .  "
+;       configuration file of BIND domain name servers).
+;
+;       This file is made available by InterNIC 
+;       under anonymous FTP as
+;          file                 /domain/named.cache
+;          on server            FTP.INTERNIC.NET
+;       -OR-                    RS.INTERNIC.NET
+;
+;       last update:    December 01, 2015
+;       related version of root zone:   2015120100
+;
+; formerly NS.INTERNIC.NET
+;
+.                       3600000     NS    A.ROOT-SERVERS.NET.
+A.ROOT-SERVERS.NET.     3600000     A     198.41.0.4
+A.ROOT-SERVERS.NET.     3600000     AAAA  2001:503:ba3e::2:30
+;
+; FORMERLY NS1.ISI.EDU
+;
+.                       3600000     NS    B.ROOT-SERVERS.NET.
+B.ROOT-SERVERS.NET.     3600000     A     192.228.79.201
+B.ROOT-SERVERS.NET.     3600000     AAAA  2001:500:84::b
+;
+; FORMERLY C.PSI.NET
+;
+.                       3600000     NS    C.ROOT-SERVERS.NET.
+C.ROOT-SERVERS.NET.     3600000     A     192.33.4.12
+C.ROOT-SERVERS.NET.     3600000     AAAA  2001:500:2::c
+;
+; FORMERLY TERP.UMD.EDU
+;
+.                       3600000     NS    D.ROOT-SERVERS.NET.
+D.ROOT-SERVERS.NET.     3600000     A     199.7.91.13
+D.ROOT-SERVERS.NET.     3600000     AAAA  2001:500:2d::d
+;
+; FORMERLY NS.NASA.GOV
+;
+.                       3600000     NS    E.ROOT-SERVERS.NET.
+E.ROOT-SERVERS.NET.     3600000     A     192.203.230.10
+;
+; FORMERLY NS.ISC.ORG
+;
+.                       3600000     NS    F.ROOT-SERVERS.NET.
+F.ROOT-SERVERS.NET.     3600000     A     192.5.5.241
+F.ROOT-SERVERS.NET.     3600000     AAAA  2001:500:2f::f
+;
+; FORMERLY NS.NIC.DDN.MIL
+;
+.                       3600000     NS    G.ROOT-SERVERS.NET.
+G.ROOT-SERVERS.NET.     3600000     A     192.112.36.4
+;
+; FORMERLY AOS.ARL.ARMY.MIL
+;
+.                       3600000     NS    H.ROOT-SERVERS.NET.
+H.ROOT-SERVERS.NET.     3600000     A     198.97.190.53
+H.ROOT-SERVERS.NET.     3600000     AAAA  2001:500:1::53
+;
+; FORMERLY NIC.NORDU.NET
+;
+.                       3600000     NS    I.ROOT-SERVERS.NET.
+I.ROOT-SERVERS.NET.     3600000     A     192.36.148.17
+I.ROOT-SERVERS.NET.     3600000     AAAA  2001:7fe::53
+;
+; OPERATED BY VERISIGN, INC.
+;
+.                       3600000     NS    J.ROOT-SERVERS.NET.
+J.ROOT-SERVERS.NET.     3600000     A     192.58.128.30
+J.ROOT-SERVERS.NET.     3600000     AAAA  2001:503:c27::2:30
+;
+; OPERATED BY RIPE NCC
+;
+.                       3600000     NS    K.ROOT-SERVERS.NET.
+K.ROOT-SERVERS.NET.     3600000     A     193.0.14.129
+K.ROOT-SERVERS.NET.     3600000     AAAA  2001:7fd::1
+;
+; OPERATED BY ICANN
+;
+.                       3600000     NS    L.ROOT-SERVERS.NET.
+L.ROOT-SERVERS.NET.     3600000     A     199.7.83.42
+L.ROOT-SERVERS.NET.     3600000     AAAA  2001:500:3::42
+;
+; OPERATED BY WIDE
+;
+.                       3600000     NS    M.ROOT-SERVERS.NET.
+M.ROOT-SERVERS.NET.     3600000     A     202.12.27.33
+M.ROOT-SERVERS.NET.     3600000     AAAA  2001:dc3::35
+; End of file</code></pre>
+                <p>Uma versão sempre atualizada deste conteúdo pode ser encontrada no seguinte endereço: <a href="https://www.internic.net/domain/named.root">https://www.internic.net/domain/named.root</a></p>
+                <p>É por ae que um servidor recursivo inicia sua busca por um domínio desconhecido por ele.</p>
+            </section>
+
+            <section id='RRs(Registro de Recursos) Comuns' class='box'>
+                <h2 class="section-title">RRs (Registro de Recursos) Comuns</h2>
+                <p>São os parametros de classe do DNS. Os mais comuns são:</p>
+                <ul>
+                    <li><strong>A:</strong> Associa um nome a um endereço IPV4.</li>
+                    <li><strong>AAAA:</strong> Mapeamento de nome a endere ̧IPV6.</li>
+                    <li><strong>NS:</strong> NameServer. Define quais servidores são os autoritativos para o domínio.</li>
+                    <li><strong>SOA:</strong> Start-Of-Authority. Detalhes da autoridade do domínio. Descreve o servidor que tem autoridade sobre a zona, além do contato técnico, número serial e outros campos de timeout.</li>
+                    <li><strong>MX:</strong> Mail eXchanger. Define os servidores de correio (e prioridade) para o domínio.</li>
+                    <li><strong>PTR:</strong> Pointer. Retorna o nome associado a um endereço IP.</li>
+                    <li><strong>CNAME:</strong> Canonical NAME. Usados para criar apelidos para o domínio.</li>
+                    <li><strong>TXT:</strong> TeXT. Usados para descrições, comentários, observações de um domínio. Também são usados para definir configurações de SPF.</li>
+                </ul>
+                <p>Uma autenticação Sender Policy Framework (SPF) é um registro de Serviço do Nome de Domínio (DNS) que identifica quais servidores de email são permitidos a enviar email em nome de seu domínio.</p>
+                <p>@servidor – é usado para pesquisas em um servidor específico (ex. ns1.nsa.gov). Caso o argumento @server não seja informado, os servidores que constam no /etc/resolv.conf serão usados.</p>
+            </section>
+
+            <section id='DIG (Domain Information Groper)' class='box'>
+                <h2 class="section-title">DIG (Domain Information Groper)</h2>
+                <p>O DIG (Domain Information Groper) - Serve para realizar pesquisas de DNS.</p>
+                <p>Funciona enviando consultas aos servidores e mostrando as respostas devolvidas por eles.</p>
+                <p>Dig foi criado pelo ISC (Internet Systems Consortium) mesmo criador do BIND.</p>
+                <p>O DIG oferece opções especiais que afetam como as consultas serão feitas e como o resultado será exibido. Isso é feito utilizando-se um argumento precedido do sinal “+“. E utiliza-se o "+no"+ para desativar uma opcao.</p>
+                <ul>
+                    <li><strong>+tcp:</strong> Utiliza o protocolo TCP para realizar as queries. Isso significa que a conexão terá como destino a porta TCP 53 (O padrão é usar o protocolo UDP).</li>
+                    <li><strong>+rec:</strong> Utiliza recursividade. É ativa por padrão. Podemos desativá-la usando o “+no“.</li>
+                    <li><strong>+short:</strong> Faz com que a saída tenha menos informações adicionais.</li>
+                    <li><strong>+time=N:</strong> Estabelece o timeout da consulta para N segundos.</li>
+                </ul>
+            </section>
+
+            <section id='Seções' class='box'>
+                <h2 class="section-title">Seções do DIG</h2>
+                <p>A resposta padrão de uma consulta DNS é organizada em 5 seções: Header, Question, Answer, Authority e Additional. Você pode optar por não mostrar uma ou outra seção específica. Para isso, você deve usar aquele padrão “+[no]argumento”.</p>
+                <pre class="code-block"><code>ex : +noheader +noanswer +noauthority +noadditional +noall</code></pre>
+                <h3>HEADER</h3>
+                <p>A seção “Header” sempre será exibida nas respostas. Ela contém diversas informações a respeito da consulta, assim como campos de status e de controle. Os principais são:</p>
+                <ul>
+                    <li><strong>status:</strong> indica sucesso da consulta (status: NOERROR) ou então o tipo de erro que ocorreu com a query.</li>
+                    <li><strong>flags:</strong> indicador das opções de recursividade e indicador de autoridade (flags: qr aa rd).</li>
+                    <li><strong>contadores:</strong> na mesma linha das flags, indicam quantos resultados por seção vieram na resposta.</li>
+                </ul>
+                <pre class="code-block"><code>QUERY: 1, ANSWER: 1, AUTHORITY: 2, ADDITIONAL: 2
+
+;; &gt;&gt;HEADER&lt;&lt; opcode: QUERY, status: NOERROR, id: 60822
+;; flags: qr aa rd; QUERY: 1, ANSWER: 1, AUTHORITY: 2, ADDITIONAL: 2</code></pre>
+                <h3>QUESTION</h3>
+                <p>Esta seção replica a query que foi enviada para consulta. Neste momento, torna-se somente informativo, baseado no que foi solicitado.</p>
+                <h3>ANSWER</h3>
+                <p>Esta seção contém a resposta para a consulta que foi enviada. Esta, assim como as próximas, tem um conteúdo dinâmico, ou seja, podem conter inúmeros resultados dependendo do que foi solicitado.</p>
+                <h3>AUTHORITY</h3>
+                <p>Traz o conjunto de servidores que respondem com “autoridade” pelo domínio. Na prática, nada mais é do que os registros “NS” publicados na zona de dns original.</p>
+                <p>Ainda sobre “autoridade”, podemos dizer que os servidores listados nesta seção são aqueles que possuem a informação original (ou oficial) sobre o domínio e seus registros (a, soa, ns, cname, etc). Assim, se vamos realizar uma pesquisa através de um servidor recursivo, o resultado obtido pode ser aquele que ainda está no cache deste próprio servidor. Já quando consultamos direto os servidores autoritativos, a informação retornada é a mais atualizada e fiel possível.</p>
+                <h3>ADDITIONAL</h3>
+                <p>É uma seção que traz informações auxiliares ou adicionais à pesquisa.</p>
+            </section>
+
+            <section id='FLAGS – Recursividade e Autoridade' class='box'>
+                <h2 class="section-title">FLAGS – Recursividade e Autoridade</h2>
+                <p>O bloco “Flags” nos sinaliza a respeito de atributos como autoridade e recursividade.</p>
+                <p>Este conjunto de letrinhas (aa, rd, ra, etc), são indicadores do estado (ligado/desligado) de um conjunto independente de bits que compõe a seção “Header“.</p>
+                <p>Portanto, o que vemos consolidado como “Flags” na saída do comando são os estados dos bits.</p>
+                <ul>
+                    <li><strong>QR:</strong> especifica se a mensagem é uma query (0) ou uma resposta (1). Como estamos avaliando somente as respostas, este bit sempre estará ligado (consequentemente, sempre veremos a string “qr” no campo “flags“).</li>
+                    <li><strong>AA:</strong> Authoritative Answer. Especifica que o servidor que respondeu à solicitação é autoritativo para este domínio.</li>
+                    <li><strong>TC:</strong> Truncation. Especifica que a mensagem de resposta está truncada.</li>
+                    <li><strong>RD:</strong> Recursion Desired. Especifica que a query é recursiva, ou seja, que as requisições devem ser encaminhadas a outros servidores até que o servidor autoritativo seja encontrado. Por padrão, o DIG sempre envia consultas com este bit ligado.</li>
+                    <li><strong>RA:</strong> Especifica que o servidor que respondeu à requisição suporta consultas recursivas.</li>
+                    <li><strong>Z:</strong> Reservado para uso futuro.</li>
+                </ul>
+            </section>
+
+            <section id='STATUS – Tratamento de erro nas consultas' class='box'>
+                <h2 class="section-title">STATUS – Tratamento de Erro</h2>
+                <p>“Flags” campo: “RCODE – Response Code“. Este campo é preenchido pelo servidor ao enviar sua resposta. Este campo é interpretado pelo DIG e formatado no bloco de “status:”, também na seção “Header“.</p>
+                <p>Os valores mais comuns para este campo, são:</p>
+                <pre class="code-block"><code>NOERROR (0): Nenhum erro encontrado, ou seja, sucesso.
+SERVFAIL (2): Houve algum problema com o servidor, que não conseguiu processar a query.
+NXDOMAN (3): Significa que o domínio pesquisado não existe.
+REFUSED (5): O servidor rejeitou a solicitação.</code></pre>
+                <p>Observação: O status ou nome do erro é exibido no campo ‘status:’. Já o valor entre parênteses é o valor binário no campo “RCODE”.</p>
+                
+                <h3>Exemplos de Comandos</h3>
+                <p>Pesquisa Resolução de nome (A)</p>
+                <pre class="code-block"><code>dig site.com a* Pesquisa dos servidores de correio (MX)
+    *dig site.com mx</code></pre>
+                <p>Pesquisa dos servidores DNS (NS)</p>
+                <pre class="code-block"><code>dig site.com ns</code></pre>
+                <p>Pesquisa da autoridade (SOA)</p>
+                <pre class="code-block"><code>dig site.com soa</code></pre>
+                <p>Resolução de Dns Reverso (PTR)</p>
+                <pre class="code-block"><code>dig -x 52.0.14.115</code></pre>
+                <p>Pesquisa diretamente em um servidor</p>
+                <pre class="code-block"><code>dig @nsa.gov.br site.com a</code></pre>
+                <p>Resolução completa no formato BIND</p>
+                <pre class="code-block"><code>dig +nocmd site.com any +multiline</code></pre>
+                <p>Propriedade de autorizaçao de um domínio(BOSS QUE PODE MODIFICA TUDAO)</p>
+                <pre class="code-block"><code>dig site.com +nssearch</code></pre>
+                <p>Caso um servidor seja mal configurado tem como pegar toda a base dns dele com o comando AXFR , você tentará fazer um xfer uma transferência de zone e se passar por um servidor DNS secundário por exemplo:</p>
+                <pre class="code-block"><code>dig site.com axfr </code></pre>
+                <p>Ou ainda tentar fingir ser o proprio ser o próprio server sucundário :</p>
+                <pre class="code-block"><code>dig -t AXFR site.com @ns2.site.com</code></pre>
+                <p>ROTA DNS até chegar ao ip desejado nivel traceroute:</p>
+                <pre class="code-block"><code>dig +trace site.com</code></pre>
+                <p>Reverse Lookup ip to domain:</p>
+                <pre class="code-block"><code>dig -x 192.168.0.1</code></pre>
+                <p>Listar tudão usando lista de domains:</p>
+                <pre class="code-block"><code>dig -f domains.txt any</code></pre>
+            </section>
+
+            <section id='NSLOOKUP (Name Server Lookup) Desatualizado' class='box'>
+                <h2 class="section-title">NSLOOKUP (Desatualizado)</h2>
+                <p>Utilizada para se obter informações sobre registros de DNS de um determinado domínio, host ou IP. É muito antiga não se compensa mais utilizar o proprio criador dela informa isso:</p>
+                <pre class="code-block"><code>"nslookup is deprecated and may be removed from future releases"</code></pre>
+                <p>Ou seja melhor usar o DIG e o HOST mesmo , mas para desencargo de consciencia modo de usar:</p>
+                <p>Pesquisa padrao:</p>
+                <pre class="code-block"><code>nslookup site.com</code></pre>
+                <p>Função -type ou -querytype pode utilizar as RRs tipo (SOA , MX , NS , HINFO ).</p>
+                <p>Pesquisa por qualquer info:</p>
+                <pre class="code-block"><code>nslookup -type=all site.com</code></pre>
+                <p>Pesquisa por info de mail :</p>
+                <pre class="code-block"><code>nslookup -type=mx site.com || nslookup -querytype=mx site.com</code></pre>
+                <p>Pesquisa utilizando outro server para puxar as info:</p>
+                <pre class="code-block"><code>nslookup site.com ns1.site.com</code></pre>
+                <p>Pesquisa com DEBUG:</p>
+                <pre class="code-block"><code>nslookup -debug site.com</code></pre>
+                <p>Pesquisa pelo IP:</p>
+                <pre class="code-block"><code>nslookup 192.168.0.1</code></pre>
+                <p>Pesquisa em porta não padrão:</p>
+                <pre class="code-block"><code>nslookup -port=54 site.com</code></pre>
+                <p>Pesquisa com timeout:</p>
+                <pre class="code-block"><code>nslookup -timeout=10 site.com</code></pre>
+                <p>Caso apareça "Non-authoritative answer" significado que a resposta não veio diretamente da zona do dns do server que vc está buscando, ou seja quer dizer que a resposta veio de fora vc pode utilizar o proprio server para puxar info dele por exemplo "nslookup site.com ns1.site.com" ou então buscar algum server authoritative pro domain que esta procurando.</p>
+            </section>
+
+            <section id='HOST' class='box'>
+                <h2 class="section-title">HOST</h2>
+                <p>Basicamente mesma coisa do nslookup só que muito mais eficiente, ele resolve ip para domain e vice versa , além disso consegue puxar as info de dns.</p>
+                <p>Comandos básicos seriam:</p>
+                <p>Para puxar os RRs como (SOA , HINFO , MX ,NS ,AAAA , A , CNAME , AXFR) usa o -t :</p>
+                <pre class="code-block"><code>host -t ns site.com
+host -t soa site.com
+host -t mx site.com 
+e etc...</code></pre>
+                <p>Puxa varias info:</p>
+                <pre class="code-block"><code>host -a site.com</code></pre>
+                <p>Debug e VerBose:</p>
+                <pre class="code-block"><code>host -d -v site.com</code></pre>
+                <p>Puxando info de server especifico:</p>
+                <pre class="code-block"><code>host site.com ns1.site.com</code></pre>
+            </section>
+
+            <section id='DNSTRACER' class='box'>
+                <h2 class="section-title">DNSTRACER</h2>
+                <p>Muito interessante ele mostra de onde o seu domain recebe as authoritative answers ou seja com ele vc consegue achar os servers authoritative e pode utiliza-los para fazer as buscas de info dns do domain diretamente deles.</p>
+                <p>Busca normal:</p>
+                <pre class="code-block"><code>dnstracer site.com</code></pre>
+                <p>Desliga o cache local para a busca:</p>
+                <pre class="code-block"><code>dnstracer -c site.com</code></pre>
+                <p>Permite a visualização de todos os resultados encontrados no final:</p>
+                <pre class="code-block"><code>dnstracer -o site.com</code></pre>
+                <p>Buscar pelas RRs tipo (SOA , CNAME , HINFO , MX ,NS, A ,AAAA):</p>
+                <pre class="code-block"><code>dnstracer -q ns site.com
+dnstracer -q mx site.com
+dnstracer -q soa site.com
+e etc...</code></pre>
+            </section>
+
+            <section id='DNSWALK' class='box'>
+                <h2 class="section-title">DNSWALK</h2>
+                <p>O Dnswalk é uma ferramenta que analisa os registos de determinado domínio, na zona de transferência de domínios, de varias maneiras para verificar a sua consistência e verificar se não existem erros de acordo com as práticas dos DNS. Ou seja é mais para questão de segurança apenas.</p>
+            </section>
+
+            <section id='FIERCE' class='box'>
+                <h2 class="section-title">FIERCE</h2>
+                <p>O Fierce é uma ferramenta de analise leve, que ajuda a localizar IPs não contíguos e os seus respectivos hosts e domínios. Tenta descobrir os IPS dentro de uma determinada rede para se conseguir ter uma ideia da rede.  Foi criada como uma ferramenta para ser usada antes de programas como nmap, unicornscan, Nessus, Nikto, uma vez que estes já exigem que se saiba os IPS que se está à procura. O Fierce destina-se especificamente a localizar provável alvos dentro e fora de uma rede corporativa.</p>
+                <p>Uso:</p>
+                <pre class="code-block"><code>fierce -dns bes.pt</code></pre>
+                <p>-connect</p>
+                <p>O fierce também nos permite modificar os cabeçalhos que são enviados, através do parâmetro -connect  seguido do caminho para o ficheiro onde se encontram os cabeçalhos que queremos enviar. Em conjunto  tenta fazer uma ligação por HTTP a todos os endereços públicos sejam eles FTP, SMTP. POP3 entre outros. É mostrado os cabeçalhos em resposta dadas a esses pedidos na consola. Se tivermos o ficheiros com os cabeçalhos no nosso Desktop, será:</p>
+                <pre class="code-block"><code>fierce -dns bes.pt -connect /root/Desktop/headers.txt</code></pre>
+                <p>-delay</p>
+                <p>Podem modificar o tempo de espera entre pedidos com o parâmetro  -delay  de seguida o numero de segundos. Sendo neste exemplo um atraso de 2 segundos entre os pedidos.</p>
+                <pre class="code-block"><code>fierce -dns google.br -delay 2</code></pre>
+                <p>-dnsfile</p>
+                <p>É possível utilizarmos um(s) servidor(es) de DNS especifico(s) bastando para isso utilizar o parâmetro –dnsfile seguido do caminho do ficheiro onde se encontra um por linha, os servidores de DNS a usar.  Neste caso vamos criar um ficheiro no Desktop com o nome de dns.txt e introduzir o 4.4.4.4. Este 4.4.4.4 é um endereço de um servidor de DNS, neste caso um publico do Google.</p>
+                <p>-file</p>
+                <p>Para ficarmos com os resultados obtidos gravados para uma futura referencia utiliza-se o parâmetro -file.  Vamos neste caso salva-lo no no Desktop no ficheiro resultados.</p>
+                <pre class="code-block"><code>fierce -dns exemplo.br -file /root/Desktop/resultados.txt</code></pre>
+                <p>-suppress</p>
+                <p>Quando combinado com o parâmetro –suppress e o -file, não é para a consola nenhum resultado e fica apenas guardado no ficheiro  que é passado com o -file</p>
+                <pre class="code-block"><code>fierce -dns exemplo.br -file /root/Desktop/resultados.txt -suppress</code></pre>
+                <p>-fulloutput</p>
+                <p>O paramento -fulloutput quando combinado com o -connect irá apresentar tudo que o servidor manda de volta e não sou os cabeçalhos</p>
+                <pre class="code-block"><code>fierce -dns bes.pt -connect /root/Desktop/headers.txt -fulloutput</code></pre>
+                <p>-nopattern</p>
+                <p>Com o parâmetro -nopattern activo não é utilizado uma patente quando é efectuada a procura de alojamentos perto do alvo. Faz bastante alarido mo lado do servidor mas bastante bom para encontrar outros domínios que possam ser utilizados.</p>
+                <pre class="code-block"><code>fierce -dns bes.pt -nopattern</code></pre>
+                <p>-range</p>
+                <p>É possível tentar encontrar o que se encontra em determinados intervalos com o parâmetro –range. Deverá ser utilizado com o parâmetro –dnsserver. Vamos mais uma vez utilizar o do google, o 4.4.4.4. Este ips a procurar deverão ser os encontrados até agora, como por exemplo no resultado do primeiro exemplo dado</p>
+                <pre class="code-block"><code>fierce -range 194.145.121.0-255 -dnsserver 4.4.4.4</code></pre>
+                <p>-search</p>
+                <p>Com o -search o fierce tenta fazer uma procura através dos ips encontrados tenta encontrar domínios, no mesmo servidor, da mesma empresa. Podem ser adicionados mais que um nome a procurar se forem separados por uma virgula.</p>
+                <pre class="code-block"><code>fierce -dns bes.pt -search bes,bes360,besauto</code></pre>
+                <p>-tcptimeout</p>
+                <p>Se for necessário mudar o tempo de espera, por defeito 10 segundos, pode-se faze-lo com o parâmetro -tcptimeout. Poderá ser utilil se o servidor DNS for lento ou houver muito movimento na vossa rede.</p>
+                <pre class="code-block"><code>fierce -dns teste.pt -tcptimeout 15</code></pre>
+                <p>-traverse</p>
+                <p>Quando é efectuado uma pesquisa, após ter sido encontrado um IP o fierce procura por IPS perto deste. Por defeito é  5 para cima e 5 para baixo. Este valor pode ser alterado com o parâmetro –traverse e de seguida o numero que querem.</p>
+                <pre class="code-block"><code>fierce -dns teste.pt -traverse10</code></pre>
+                <p>-wide</p>
+                <p>O parametro -wide faz uma pesquisa de toda a classe C depois de encontrar um domínio nessa classe C. Gera muito trafico e consequentemente muito barulho do lado do servidor, mas descobre muita informação.</p>
+                <pre class="code-block"><code>fierce -dns teste.pt -wide</code></pre>
+                <p>-wordlist</p>
+                <p>Se quiserem utilizar um dicionário para os subdomínios em vez do que vem com o Fierce podem faze-lo com o parâmetro -wordlist seguido do caminho do dicionário. Este dicionário deverá conter uma palavra por linha.</p>
+                <pre class="code-block"><code>fierce -dns teste.pt -wordlist caminho/para/o/dicionario.txt</code></pre>
+            </section>
+
+            <section id='Ref:' class='box'>
+                <h2 class="section-title">Referências</h2>
+                <pre class="code-block"><code>http://cr.yp.to/djbdns.html
+https://cr.yp.to/djbdns/debugging.html
+http://www.hacks.pt/ferramentas-kali-linux/recolha-de-informacao/analise-dns/</code></pre>
+            </section>
+
+            <section id='Falta testar:' class='box'>
+                <h2 class="section-title">Ferramentas para Testar</h2>
+                <pre class="code-block"><code>urlcrazy
+https://github.com/makefu/dnsmap
+dnsmap
+dnsrecon
+dnsenum
+
+dnsdict6
+dnsrevenum6
+maltego
+nmap
+zenmap
+tinydns-get
+dnsq
+ping</code></pre>
+            </section>
+
+        </main>
+
+    </div> 
+</body>
+
+<!-- Mirrored from f3l1p3.neocities.org/arquivos/dns by HTTrack Website Copier/3.x [XR&CO'2014], Sun, 05 Oct 2025 19:28:16 GMT -->
+</html>

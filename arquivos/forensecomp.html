@@ -1,0 +1,337 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+
+<!-- Mirrored from f3l1p3.neocities.org/arquivos/forensecomp by HTTrack Website Copier/3.x [XR&CO'2014], Sun, 05 Oct 2025 19:28:12 GMT -->
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Forense Computacional</title>
+    <link href="../favicon.ico" rel="icon" type="image/x-icon" />
+    <link id="theme-stylesheet" href="../assets/nostalgic.css" rel="stylesheet" type="text/css" media="all">
+</head>
+
+<body>
+
+    <input type="checkbox" id="theme-toggle" style="display: none;"/>
+
+    <div class="site-wrapper">
+
+        <header class="site-header">
+            <h1 class="main-title">Forense Computacional</h1>
+            <p class="subtitle">Análise e Coleta de Evidências Digitais</p>
+        </header>
+
+        <nav class='menu-bar'>
+            <div class="menu-item"><a href="../index.html">[MENU]</a></div>
+            <div class="menu-item"><a href="../sobre.html">[Sobre o FEP]</a></div>
+            <div class="menu-item"><a href="arquivos.html">[Arquivos]</a></div>
+            <div class="menu-item"><a href="../ezines/ezines.html">[Ezines]</a></div>
+            <div class="menu-item"><a href="../links.html">[Sites Interessantes]</a></div>
+            <div class="menu-item theme-switcher">
+                <label for="theme-toggle" style="cursor: pointer;">[MODO VISUAL]</label>
+            </div>
+        </nav>
+
+        <main class="content-area">
+
+            <section class="box">
+                <h2 class="section-title">Índice</h2>
+                <ul>
+                    <li><a href='#Ferramentas para monitoração'>Ferramentas para Monitoração</a></li>
+                    <li><a href='#Coletando dados brutos'>Coletando Dados Brutos</a></li>
+                    <li><a href='#Estado da rede'>Estado da Rede</a></li>
+                    <li><a href='#Coletando informações sobre o estado do sistema'>Coletando Informações sobre o Estado do Sistema</a></li>
+                    <li><a href='#Informações do sistema de arquivos'>Informações do Sistema de Ficheiros</a></li>
+                    <li><a href='#Análise dos dados coletados'>Análise dos Dados Coletados</a></li>
+                    <li><a href='#Ferramentas para análise'>Ferramentas para Análise</a></li>
+                    <li><a href='#Análise de Logs'>Análise de Logs</a></li>
+                    <li><a href='#Refer'>Referências</a></li>
+                </ul>
+            </section>
+
+            <section id='Ferramentas para monitoração' class='box'>
+                <h2 class="section-title">Ferramentas para Monitoração</h2>
+                <h3>Monitorando mudanças no sistema de arquivos:</h3>
+                <pre class="code-block"><code>Tripwire (http://www.tripwire.com).</code></pre>
+                <pre class="code-block"><code>Aide (http://www.cs.tut.fi/~rammer/aide.html).</code></pre>
+                <h3>Centralizando logs:</h3>
+                <pre class="code-block"><code>syslog-ng (http://www.balabit.hu/en/downloads/syslog-ng).</code></pre>
+                <h3>Identificação de rootkits:</h3>
+                <pre class="code-block"><code>chkrootkit (http://www.chkrootkit.org).</code></pre>
+                <h3>Registro de conexões:</h3>
+                <pre class="code-block"><code>TCPwrapper.</code></pre>
+            </section>
+
+            <section id='Coletando dados brutos' class='box'>
+                <h2 class="section-title">Coletando Dados Brutos</h2>
+                <h3>Dump da memória:</h3>
+                <pre class="code-block"><code>dd if /dev/mem of &lt;destino&gt;
+dd if /dev/kmem of &lt;destino&gt;
+dd if /dev/rswap of &lt;destino&gt;</code></pre>
+                <h3>Dump nos discos:</h3>
+                <pre class="code-block"><code>dd if &lt;dipostivo&gt; of &lt;destino&gt;</code></pre>
+                <h3>Obtendo dados da memória da placa de vídeo:</h3>
+                <pre class="code-block"><code>xwd -display :0 -root &gt; screen.xwd
+xwud -in screen.xwd</code></pre>
+                <h3>Transferindo informações coletadas através do Netcat:</h3>
+                <pre class="code-block"><code>Servidor: nc -p &lt;porta&gt; -l &gt; &lt;saída&gt;
+Cliente: &lt;comando_do_sistema&gt; | nc -w 3 to &lt;porta&gt;</code></pre>
+            </section>
+
+            <section id='Estado da rede' class='box'>
+                <h2 class="section-title">Estado da Rede</h2>
+                <h3>Configurações da rede:</h3>
+                <pre class="code-block"><code>ifconfig, iwconfig
+route -n
+arp
+netstat -tupan, lsof -i
+unhidetcp &lt;-- portas tcp/udp ocultas</code></pre>
+                <h3>Coletando o tráfego:</h3>
+                <pre class="code-block"><code>tcpdump -l -n -e -x -vv -s 1500
+ethereal</code></pre>
+                <h3>Quais sistema estão conectados e quais aplicações estão usando conexões de internet no momento:</h3>
+                <pre class="code-block"><code> ss </code></pre>
+            </section>
+
+            <section id='Coletando informações sobre o estado do sistema' class='box'>
+                <h2 class="section-title">Coletando Informações sobre o Estado do Sistema</h2>
+                <h3>Login de usuários:</h3>
+                <p>Usuários atualmente logados:</p>
+                <pre class="code-block"><code>w, who</code></pre>
+                <p>Files:</p>
+                <pre class="code-block"><code>/etc/utmp, /var/run/utmp, /var/adm/utmp(x).</code></pre>
+                <h3>Informações de usuarios:</h3>
+                <pre class="code-block"><code> finger</code></pre>
+                <h3>Últimos logins efetuados:</h3>
+                <pre class="code-block"><code>last</code></pre>
+                <p>Files:</p>
+                <pre class="code-block"><code>/var/adm/wtmp, /var/log/wtmp, /var/adm/wtmpx</code></pre>
+                <h3>Logins antigos efetuados:</h3>
+                <pre class="code-block"><code>last user -d -a -f /var/log/wtmp.1</code></pre>
+                <h3>Último acesso de cada usuário:</h3>
+                <pre class="code-block"><code>lastlog</code></pre>
+                <p>Files:</p>
+                <pre class="code-block"><code>/var/adm/lastlog, /var/log/lastlog.</code></pre>
+                <h3>Última tentativa de login que não obteve êxito:</h3>
+                <pre class="code-block"><code>lastb</code></pre>
+                <p>File:</p>
+                <pre class="code-block"><code>/var/log/btmp</code></pre>
+                <h3>Últimos comandos executados:</h3>
+                <pre class="code-block"><code>history , cat ~/.bash_history</code></pre>
+                <h3>Tempo de vida da maquina:</h3>
+                <pre class="code-block"><code> uptime</code></pre>
+                <h3>Pacotes instalados:</h3>
+                <pre class="code-block"><code> dpkg -l*</code></pre>
+                <h3>Data e hora:</h3>
+                <pre class="code-block"><code> date</code></pre>
+                <h3>Utilização de discos:</h3>
+                <pre class="code-block"><code>df -HT</code></pre>
+                <h3>Esquema de particionamento:</h3>
+                <pre class="code-block"><code>fdisk -l</code></pre>
+                <h3>Versao do kernel utilizada:</h3>
+                <pre class="code-block"><code>uname -a</code></pre>
+                <h3>Processos:</h3>
+                <p>Processos atualmente em execução:</p>
+                <pre class="code-block"><code>ps auxeww, ps ealf, 
+Files: /vmunix, /dev/kmem, /proc</code></pre>
+                <p>Arquivos abertos:</p>
+                <pre class="code-block"><code> lsof</code></pre>
+                <p>Abertos por um determinado usuário:</p>
+                <pre class="code-block"><code>lsof –u UID</code></pre>
+                <p>Arquivos chamados por um processo:</p>
+                <pre class="code-block"><code>lsof –p PID</code></pre>
+                <p>Últimos comandos executados:</p>
+                <pre class="code-block"><code>lastcomm
+Files: /var/adm/pacct, /var/account/acct, /var/log/pacct.</code></pre>
+                <p>Processos ocultos:</p>
+                <pre class="code-block"><code>unhide [proc/sys/brute]</code></pre>
+                <h3>Memoria:</h3>
+                <p>Dados da memoria:</p>
+                <pre class="code-block"><code>free m</code></pre>
+                <h3>Kernel e módulos:</h3>
+                <p>Configurações gerais:</p>
+                <pre class="code-block"><code>uname -a</code></pre>
+                <p>Módulos carregados:</p>
+                <pre class="code-block"><code>lsmod, cat /proc/modules</code></pre>
+                <p>Módulos ocultos:</p>
+                <pre class="code-block"><code>kstat -M (http://www.s0ftpj.org/tools/)</code></pre>
+            </section>
+
+            <section id='Informações do sistema de arquivos' class='box'>
+                <h2 class="section-title">Informações do Sistema de Ficheiros</h2>
+                <pre class="code-block"><code>fsstat &lt;-- tipo de fs</code></pre>
+                <h3>MAC Times:</h3>
+                <p>Horário de último acesso:</p>
+                <pre class="code-block"><code>ls -altu</code></pre>
+                <p>Tempo de alteração:</p>
+                <pre class="code-block"><code>ls -alt</code></pre>
+                <p>Tempo de mudança nas permissões:</p>
+                <pre class="code-block"><code>ls -altc</code></pre>
+                <h3>Verificar arquivos que foram alterados nas ultimas 24 horas:</h3>
+                <pre class="code-block"><code>find / -ctime 1 -ls</code></pre>
+                <h3>Verificar arquivos que foram acessados nas ultimas 24 horas:</h3>
+                <pre class="code-block"><code>find / -atime 1 -ls</code></pre>
+                <h3>Propriedades de um arquivo:</h3>
+                <pre class="code-block"><code>stat &lt;arquivo&gt;
+file &lt;arquivo&gt;</code></pre>
+                <h3>Mostra arquivos ocultos com espaços em branco:</h3>
+                <pre class="code-block"><code>ls -la | cat -A</code></pre>
+                <h3>Registro de todos os arquivos presentes no sistema:</h3>
+                <pre class="code-block"><code>find / -type f -print0 | xargs -0 md5sum &gt; &lt;saída&gt;</code></pre>
+                <h3>chkrootkit e rkhunter: procuram por rootkits.</h3>
+                <p>Exemplos:</p>
+                <pre class="code-block"><code># chkrootkit ­r /mnt
+# rkhunter ­­update; rkhunter ­c ­r /mnt</code></pre>
+                <h3>clamav: procura por worms e vírus.</h3>
+                <p>Exemplo:</p>
+                <pre class="code-block"><code>freshclam; clamscan ­r /mnt</code></pre>
+            </section>
+            
+            <section id='Análise dos dados coletados' class='box'>
+                <h2 class="section-title">Análise dos Dados Coletados</h2>
+                <h3>Buscas nos dumps de disco e memória?</h3>
+                <ul>
+                    <li>strings e grep.</li>
+                    <li>Podem encontrar informações em blocos marcados como defeituos.</li>
+                    <li>Útil para recuperação de trechos de arquivos apagados, em particular, de logs apagados.</li>
+                </ul>
+                <h3>Análise de binários suspeitos</h3>
+                <p>Tabela de símbolos:</p>
+                <pre class="code-block"><code>nm &lt;binário&gt;, nm -Du &lt;binário&gt;</code></pre>
+                <p>Bibliotecas dinâmicas associadas:</p>
+                <pre class="code-block"><code>ldd &lt;binário&gt;</code></pre>
+                <p>Visualização em hexadecimal:</p>
+                <pre class="code-block"><code>cat &lt;binário&gt; | xxd</code></pre>
+                <p>Chamadas de sistema (em um ambiente de testes):</p>
+                <pre class="code-block"><code>strace &lt;binário&gt;</code></pre>
+                <p>Pausando a execução de um processo:</p>
+                <pre class="code-block"><code>kill -STOP &lt;pid&gt;</code></pre>
+            </section>
+            
+            <section id='Ferramentas para análise' class='box'>
+                <h2 class="section-title">Ferramentas para Análise</h2>
+                <h3>TCT – The Coroner's Toolkit (http://www.porcupine.org/forensics/tct.html):</h3>
+                <pre class="code-block"><code>Conjunto de ferramentas para forense.</code></pre>
+                <h3>TCTUtils (http://www.porcupine.org/forensics/tct.html):</h3>
+                <pre class="code-block"><code>Utilitários que provêem funcionalidades extras ao TCP.</code></pre>
+                <h3>TASK - The @stake Sleuth Kit (http://www.sleuthkit.org/):</h3>
+                <pre class="code-block"><code>Engloba as funcionalidades do TCT e do TCTUtils para anállise do sistema de arquivos, além de recursos adicionais.
+Portado para uma série e plataformas.</code></pre>
+                <h3>AFB - Autopsy Forensic Browser (http://www.sleuthkit.org/autopsy):</h3>
+                <pre class="code-block"><code>Provê uma interface gráfica para o TASK.</code></pre>
+                <h3>The Coroner's Toolkit (1)</h3>
+                <p>É composto por quatro partes:</p>
+                <ul>
+                    <li><strong>grave-robber</strong>
+                        <pre class="code-block"><code>- Automatiza a coleta de evidências com os comandos citados anteriormente.
+- Executa ações adicionais (geração de assinaturas criptográficas, lista com arquivos apagados ainda em uso, históricos de shell, ...).
+- A coleta é feita de acordo com a ordem de volatilidade.</code></pre>
+                    </li>
+                    <li><strong>mactime</strong>
+                        <pre class="code-block"><code>Utiliza informações produzidas pelo grave-robber para criar um histórico de arquivos modificados e acessados em um dado intervalo de tempo.</code></pre>
+                    </li>
+                    <li><strong>lazarus</strong>
+                        <pre class="code-block"><code>lazarus: ferramenta para recuperação de arquivos apagados.</code></pre>
+                        <pre class="code-block"><code>unrm: efetua dump do espaço não alocado no disco.</code></pre>
+                    </li>
+                    <li><strong>Utilitários</strong>
+                        <pre class="code-block"><code>Utiliários usados pela ferramenta grave-roober.</code></pre>
+                    </li>
+                </ul>
+                <h3>The Coroner's Toolkit (2)</h3>
+                <p>Funcionamento do lazarus:</p>
+                <pre class="code-block"><code>– Sistemas de arquivos unix tem baixa fragmentação.
+– Tenta identificar o tipo de arquivo ao qual pertence um espaço não
+alocado do disdo de 100 bytes.
+– Armazena em um arquivo os blocos de dados lidos enquanto o tipo de
+arquivo identificado não for alterado.
+– Não funciona bem com arquivos grandes.</code></pre>
+                <p>Exemplos de utilitários:</p>
+                <pre class="code-block"><code>– pcat: efetua o dump de um processo na memória.
+– icat (ou inode-cat): visualiza o conteúdo de um arquivo a partir no
+número do seu inode. Pode recuperar arquivos apagados ou parte deles.
+– ils: lista informações inodes de arquivos removidos.</code></pre>
+                <h3>TCTUtils</h3>
+                <p>Exemplos de utitários:</p>
+                <pre class="code-block"><code>– bcat: exibe o conteúdo de um bloco de dados presente no sistema de
+arquivos.
+– blockcalc: mapeia blocos do sistema de arquivos orginal com a imagem
+gerada pela ferramenta unrm.
+– fls: lista as entradas de um bloco de dados pertencente a um diretório.
+– find_file: tenta encontrar o nome de arquivo associado a um inode.
+– find_inode: tenta encontrar o inode que tem alocado um determinado
+bloco de dados do sistema de arquivos.
+– istat: exibe informações sobre um determinado inode.</code></pre>
+                <h3>The @stake Sleuth Kit</h3>
+                <ul>
+                    <li>Suporte a sistemas de arquivos de diversos SOs (BSD, Linux, Solaris, Windows).</li>
+                    <li>Exemplos de utilitários:</li>
+                </ul>
+                <pre class="code-block"><code>– dstat: exibe informações sobre um determinado bloco.
+– fsstat: informações detalhas sobre o sistema de arquivos em uma
+determinada partição.
+– icat: semelhante ao icat do TCT.
+– dcat: semelhante ao bcat do TCTUtils.
+– Outras ferramenas com funções similares as exibidas anteriormente
+
+apt-get install sleuthkit
+dpkg -L sleuthkit
+
+recupera dados apagados, discos corrompidos:
+foremost, testdisk</code></pre>
+            </section>
+            
+            <section id='Análise de Logs' class='box'>
+                <h2 class="section-title">Análise de Logs</h2>
+                <h3>GLOGG http://glogg.bonnefon.org/</h3>
+                <h3>Logs do sistema</h3>
+                <p>Arquivo de configs dos logs:</p>
+                <pre class="code-block"><code>/etc/rsyslog.conf
+/etc/logrotate.conf 
+/var/log/*; /var/log/apache2/*;</code></pre>
+                <p>Arquivo que registra os logs do Servidor de E-mails:</p>
+                <pre class="code-block"><code>/etc/mail/maillog</code></pre>
+                <p>Contém registros de acesso ao sistema e em alguns casos registros do IPTABLES:</p>
+                <pre class="code-block"><code>/var/log/messages</code></pre>
+                <p>Logs do Servidor Web Apache:</p>
+                <pre class="code-block"><code>/var/log/httpd/(access, error ou agent.log)</code></pre>
+                <p>Logs de impressoras:</p>
+                <pre class="code-block"><code>/var/log/lpr.log</code></pre>
+                <p>Logs de serviços em geral:</p>
+                <pre class="code-block"><code>/etc/log/daemon.log  ou /var/log/daemon.log</code></pre>
+                <p>Log do sistema:</p>
+                <pre class="code-block"><code>/var/log/syslog</code></pre>
+                <p>Log de autenticação:</p>
+                <pre class="code-block"><code>/var/log/auth.log</code></pre>
+                <p>Log do Kernel:</p>
+                <pre class="code-block"><code>/var/log/kern.log</code></pre>
+                <p>Log crond:</p>
+                <pre class="code-block"><code>/var/log/cron.log</code></pre>
+                <p>Log de erro e acesso a Lighttpd:</p>
+                <pre class="code-block"><code>/var/log/lighttpd</code></pre>
+                <p>Log do registro de inicialização do sistema:</p>
+                <pre class="code-block"><code>/var/log/boot.log</code></pre>
+                <p>Log do registro de banco de dados MySQL:</p>
+                <pre class="code-block"><code>/var/log/mysqld.log</code></pre>
+                <h3>Arquivos Temporarios:</h3>
+                <pre class="code-block"><code>/tmp; /var/tmp</code></pre>
+                <h3>Arquivos para servidores:</h3>
+                <pre class="code-block"><code>/var/www; /var/ftp;</code></pre>
+                <h3>Arquivos de config do sistema e serviços:</h3>
+                <pre class="code-block"><code>/etc/*;</code></pre>
+            </section>
+
+            <section id='Refer' class='box'>
+                <h2 class="section-title">Referências</h2>
+                <ul>
+                    <li>ftp://ftp.registro.br/pub/gts/gts0205/05-tech-tools-forensics.pdf</li>
+                </ul>
+            </section>
+
+        </main>
+
+    </div> 
+</body>
+
+<!-- Mirrored from f3l1p3.neocities.org/arquivos/forensecomp by HTTrack Website Copier/3.x [XR&CO'2014], Sun, 05 Oct 2025 19:28:13 GMT -->
+</html>

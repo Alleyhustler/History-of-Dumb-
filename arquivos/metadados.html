@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+
+<!-- Mirrored from f3l1p3.neocities.org/arquivos/metadados by HTTrack Website Copier/3.x [XR&CO'2014], Sun, 05 Oct 2025 19:28:15 GMT -->
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Metadados e Anonimato</title>
+    <link href="../favicon.ico" rel="icon" type="image/x-icon" />
+    <link id="theme-stylesheet" href="../assets/nostalgic.css" rel="stylesheet" type="text/css" media="all">
+</head>
+
+<body>
+
+    <input type="checkbox" id="theme-toggle" style="display: none;"/>
+
+    <div class="site-wrapper">
+
+        <header class="site-header">
+            <h1 class="main-title">Anonimato de Metadados</h1>
+            <p class="subtitle">O Que os Seus Ficheiros Dizem Sobre Si</p>
+        </header>
+
+        <nav class='menu-bar'>
+            <div class="menu-item"><a href="../index.html">[MENU]</a></div>
+            <div class="menu-item"><a href="../sobre.html">[Sobre o FEP]</a></div>
+            <div class="menu-item"><a href="arquivos.html">[Arquivos]</a></div>
+            <div class="menu-item"><a href="../ezines/ezines.html">[Ezines]</a></div>
+            <div class="menu-item"><a href="../links.html">[Sites Interessantes]</a></div>
+            <div class="menu-item theme-switcher">
+                <label for="theme-toggle" style="cursor: pointer;">[MODO VISUAL]</label>
+            </div>
+        </nav>
+
+        <main class="content-area">
+
+            <section class="box">
+                <h2 class="section-title">Índice</h2>
+                <ul>
+                    <li><a href='#Anonimato de Metadados em arquivos'>Anonimato de Metadados em Ficheiros</a></li>
+                    <li><a href='#Verificando e Limpando os METADADOS'>Verificando e Limpando os Metadados</a></li>
+                </ul>
+            </section>
+
+            <section id='Anonimato de Metadados em arquivos' class='box'>
+                <h2 class="section-title">Anonimato de Metadados em Ficheiros</h2>
+                <p>Quando vc cria arquivos , muitas das vezes são armazenados metadados que podem conter informaçoes que permitam identificar sua pessoa.</p>
+                <h3><strong>7-Zip</strong></h3>
+                <p>Se vc executar em MacOS não use AppleDouble pois ficará gravado o seu nome de user.</p>
+                <h3><strong>Tar</strong></h3>
+                <p>O comando TAR no nix por default inclui o user e o grupo que cada file possui isso pode incluir seu nome para evitar isso pode user o comando de -owner e -group e escolher um owner e grupo para ficar no file.</p>
+                <pre class="code-block"><code>Ex: "tar -owner=root -group=root -cvf super.tar"</code></pre>
+                <h3><strong>Zip</strong></h3>
+                <p>O zip por si só não apresenta nenhuma info sua mas se vc usar algum software ele pode add algum metado com info sua se o soft suportar campos extras desabilite.</p>
+                <h3><strong>Rar</strong></h3>
+                <p>É melhor nem usar o rar troca pelo 7-zip</p>
+                <h3><strong>Audio</strong></h3>
+                <p>Arquivo de audio contem muitos metadados como ID3 ,APE, Vorbis esses dados sao usados para armazenar nome da musica , do artista , a arte da capa , agora se for um arquivo criado por vc ele pode contar info sobre sua pessoa , use um editar de tag para remover.</p>
+                <p>Alem disso muitos possuem um conteiner que podem incluir outros files que tambem podem precisar de verificacao.</p>
+                <p>Os audios .waf geralmente produzidos por cameras possuem metados EXIF , delete esses metadados.</p>
+                <h3><strong>Docs Office</strong></h3>
+                <p>Melhor nem usar , ele possui muitos metadados.</p>
+                <h3><strong>Docs OpenDocument</strong></h3>
+                <p>Armazena o nome do autor nos registros de criacao e de modificacao.</p>
+                <h3><strong>PDF</strong></h3>
+                <p>Alguns programas de PDF preenchem o campo Autor com seu nome quando executados , sempre bom deletar esse recurso no software.</p>
+                <h3><strong>GIF</strong></h3>
+                <p>O Gif suporta apenas o metadado de comentario ou seja tudo que vc precisa fazer é se certificar que esse comentario na possua info sua.</p>
+                <h3><strong>JPEG</strong></h3>
+                <p>O JEG suporta comentario e tbm EXIF e XMP que são metadados que podem dar info sobre ti como localizacao por exemplo ou seja melhor remover antes de enviar para alguem tambem suporta perfis de cores ICC que podem idenfica-lo.</p>
+                <h3><strong>PNG</strong></h3>
+                <p>Suporta comentario e tbm perfils de cores ICC , tudo que vc precisa certifcar é de que nos coments nao estao info pessoal e que o perfil de cor nao exista ou entao esteja definido para sRGB ou AdobeRGB.</p>
+                <h3><strong>Videos</strong></h3>
+                <p>Files de video podem conter EXIF ou XMP que podem identifica-lo, alem disse muitos podem existir em um formato conteiner que podem incluir outros files que vc precisara verificar tbm.</p>
+            </section>
+
+            <section id='Verificando e Limpando os METADADOS' class='box'>
+                <h2 class="section-title">Verificando e Limpando os Metadados</h2>
+                <h3>Exiftool</h3>
+                <pre class="code-block"><code>para verificar e modificar os metadados</code></pre>
+                <h3>Xpdf</h3>
+                <pre class="code-block"><code>Para pdf ,contem o pdfinfo que pega os metadados e o pdfimages que pega as imagens</code></pre>
+                <h3>Qpdf</h3>
+                <pre class="code-block"><code>Parecido com o xpdf retira senhas de pdf com --decrypt</code></pre>
+                <h3>MAT(Metadata Anonymisation Toolkit)</h3>
+                <pre class="code-block"><code>Permite modificar metadados de files</code></pre>
+                <h3>Para extrair strings de files:</h3>
+                <pre class="code-block"><code>cat /tmp/file.doc | tr -d \\0 | strings | more</code></pre>
+            </section>
+
+        </main>
+
+    </div> 
+</body>
+
+<!-- Mirrored from f3l1p3.neocities.org/arquivos/metadados by HTTrack Website Copier/3.x [XR&CO'2014], Sun, 05 Oct 2025 19:28:15 GMT -->
+</html>

@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+
+<!-- Mirrored from f3l1p3.neocities.org/arquivos/dnsspoofing by HTTrack Website Copier/3.x [XR&CO'2014], Sun, 05 Oct 2025 19:28:16 GMT -->
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Análise de DNS Spoofing</title>
+    <link href="../favicon.ico" rel="icon" type="image/x-icon" />
+    <link id="theme-stylesheet" href="../assets/nostalgic.css" rel="stylesheet" type="text/css" media="all">
+</head>
+
+<body>
+
+    <input type="checkbox" id="theme-toggle" style="display: none;"/>
+
+    <div class="site-wrapper">
+
+        <header class="site-header">
+            <h1 class="main-title">DNS Spoofing</h1>
+            <p class="subtitle">Análise de um Vetor de Ataque Clássico</p>
+        </header>
+
+        <nav class='menu-bar'>
+            <div class="menu-item"><a href="../index.html">[MENU]</a></div>
+            <div class="menu-item"><a href="../sobre.html">[Sobre o FEP]</a></div>
+            <div class="menu-item"><a href="arquivos.html">[Arquivos]</a></div>
+            <div class="menu-item"><a href="../ezines/ezines.html">[Ezines]</a></div>
+            <div class="menu-item"><a href="../links.html">[Sites Interessantes]</a></div>
+            <div class="menu-item theme-switcher">
+                <label for="theme-toggle" style="cursor: pointer;">[MODO VISUAL]</label>
+            </div>
+        </nav>
+
+        <main class="content-area">
+
+            <section class="box">
+                <h2 class="section-title">Índice</h2>
+                <ul>
+                    <li><a href='#dns-spoofing-conceito'>DNS Spoofing: O Conceito</a></li>
+                    <li><a href='#vetor-ettercap'>Vetor de Ataque: Análise do Ettercap</a></li>
+                    <li><a href='#vetor-arpspoof'>Vetor de Ataque: Análise de Arpspoof e Dnsspoof</a></li>
+                </ul>
+            </section>
+
+            <section id='dns-spoofing-conceito' class='box'>
+                <h2 class="section-title">DNS Spoofing: O Conceito</h2>
+                <p>O DNS possui uma série de vulnerabilidades que podem ser exploradas por um atacante. Um atacante pode, por exemplo, obter acesso ao servidor DNS de uma organização e alterar os seus mapeamentos, de forma que o seu computador passe a possuir o nome de um computador dessa organização que tem uma relação de confiança com o computador-alvo.</p>
+                <p>Um invasor pode corromper o servidor DNS de uma organização, fazendo com que ele responda com o IP do seu próprio servidor quando os utilizadores da instituição desejam aceder, por exemplo, ao site de um banco. Versões mais antigas de servidores DNS são particularmente vulneráveis, permitindo que o seu cache seja corrompido remotamente para atingir os mesmos objetivos.</p>
+                <p><strong>Dns Spoofing</strong> (ou envenenamento de cache DNS) é um ataque no qual dados falsos são introduzidos na base de dados de cache de um servidor DNS, fazendo com que o servidor redirecione nomes de domínio para endereços IP incorretos, desviando o tráfego para outro computador (muitas vezes, o do atacante).</p>
+                <p>Normalmente, um computador em rede utiliza um servidor DNS fornecido pela sua organização ou pelo seu Provedor de Serviços de Internet (ISP). Servidores DNS são geralmente implementados na rede de uma organização para melhorar o desempenho, guardando em cache os resultados de consultas anteriores. Um ataque de envenenamento num único servidor DNS pode afetar todos os utilizadores atendidos por ele, direta ou indiretamente.</p>
+                <p>Para executar um ataque de envenenamento de cache, o atacante explora uma falha no software DNS. Se o servidor não validar corretamente as respostas DNS para garantir que elas vêm de uma fonte autoritativa (por exemplo, utilizando **DNSSEC**), o servidor acabará por guardar em cache as entradas incorretas e fornecê-las a outros utilizadores que façam o mesmo pedido.</p>
+            </section>
+
+            <section id='vetor-ettercap' class='box'>
+                <h2 class="section-title">Vetor de Ataque: Análise do Ettercap</h2>
+                <p>Num ataque de DNS spoofing utilizando ferramentas como o Ettercap, o atacante pode determinar para qual endereço IP um utilizador é redirecionado quando acede a um determinado domínio. A configuração de um ataque deste tipo envolve a edição de um ficheiro de configuração, como o `etter.dns`.</p>
+                <p>Um exemplo de configuração nesse ficheiro seria:</p>
+                <pre class="code-block"><code># Exemplo de configuração em /usr/local/share/ettercap/etter.dns
+# Domínio Alvo      Tipo   IP Falso
+exemplo-alvo.com      A      192.168.1.100
+www.exemplo-alvo.com  A      192.168.1.100</code></pre>
+                <ul>
+                    <li><strong>exemplo-alvo.com:</strong> Domínio que, quando acedido pela vítima, será redirecionado.</li>
+                    <li><strong>A:</strong> Tipo de registo de DNS (um endereço IPv4).</li>
+                    <li><strong>192.168.1.100:</strong> Endereço IP malicioso para onde o tráfego será desviado.</li>
+                </ul>
+                <p>A execução do ataque normalmente envolve um comando que especifica o modo de operação, o tipo de ataque Man-in-the-Middle (MITM), a interface de rede e o plugin a ser usado.</p>
+                <pre class="code-block"><code># Exemplo de comando de execução
+ettercap -T -q -M arp -i [interface] -P dns_spoof /[alvo]/</code></pre>
+                <p>Quando um anfitrião na rede acede ao domínio-alvo, o seu tráfego é interceptado e ele é redirecionado para o IP malicioso. É importante notar que proteções de rede contra ARP spoofing podem mitigar este tipo de ataque.</p>
+            </section>
+
+            <section id='vetor-arpspoof' class='box'>
+                <h2 class="section-title">Vetor de Ataque: Análise de Arpspoof e Dnsspoof</h2>
+                <p>Outra forma de realizar um ataque de DNS spoofing numa rede local é através da combinação de envenenamento ARP com a falsificação de DNS.</p>
+                <h3>Passo 1: Envenenamento do Cache ARP</h3>
+                <p>Primeiro, o atacante posiciona-se como o intermediário ("Man-in-the-Middle") entre a vítima e o router (gateway). Isto é feito através de ARP spoofing, enganando ambos os dispositivos sobre os endereços MAC um do outro.</p>
+                <pre class="code-block"><code># Exemplo de comando para envenenar o cache ARP da vítima
+arpspoof -i [interface] -t [IP_da_vitima] [IP_do_router]
+
+# Exemplo de comando para envenenar o cache ARP do router
+arpspoof -i [interface] -t [IP_do_router] [IP_da_vitima]</code></pre>
+                <p>Ao fazer isto em ambas as direções, todo o tráfego da vítima passa pelo computador do atacante.</p>
+                <h3>Passo 2: Falsificação de DNS</h3>
+                <p>Com o tráfego a ser redirecionado, o atacante cria um ficheiro de anfitriões falsos, similar ao do Ettercap, para mapear domínios legítimos para um IP malicioso.</p>
+                <pre class="code-block"><code># Exemplo de conteúdo do ficheiro de anfitriões falsos
+192.168.1.100   exemplo.com
+192.168.1.100   *.exemplo.com</code></pre>
+                <p>Finalmente, a ferramenta `dnsspoof` é usada para escutar os pedidos DNS da vítima e responder com a informação falsa do ficheiro criado.</p>
+                <pre class="code-block"><code># Exemplo de comando para iniciar o dnsspoof
+dnsspoof -i [interface] -f [caminho_para_ficheiro_falso]</code></pre>
+                <p>Quando a vítima tenta aceder a `exemplo.com`, o seu pedido DNS é interceptado pelo atacante, que responde com o IP `192.168.1.100`, completando o ataque.</p>
+            </section>
+
+        </main>
+
+    </div> 
+</body>
+
+<!-- Mirrored from f3l1p3.neocities.org/arquivos/dnsspoofing by HTTrack Website Copier/3.x [XR&CO'2014], Sun, 05 Oct 2025 19:28:17 GMT -->
+</html>

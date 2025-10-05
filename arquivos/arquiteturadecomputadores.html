@@ -1,0 +1,315 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+
+<!-- Mirrored from f3l1p3.neocities.org/arquivos/arquiteturadecomputadores by HTTrack Website Copier/3.x [XR&CO'2014], Sun, 05 Oct 2025 19:28:12 GMT -->
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Arquitetura de Computadores</title>
+    <link id="theme-stylesheet" href="../assets/nostalgic.css" rel="stylesheet" type="text/css" media="all">
+    </head>
+
+<body>
+   <input type="checkbox" id="theme-toggle" style="display: none;"/>
+
+    <div class="site-wrapper">
+
+        <header class="site-header">
+            <h1 class="main-title">ARQUITETURA DE COMPUTADORES</h1>
+            <p class="subtitle">O LEGADO DIGITAL</p>
+        </header>
+
+        <nav class='menu-bar'>
+            <div class="menu-item"><a href="../index.html">[MENU PRINCIPAL]</a></div>
+            <hr class="menu-divider">
+            <div class="menu-item"><a href="../sobre.html">[SOBRE O FEP]</a></div>
+            <div class="menu-item"><a href="arquivos.html">[ARQUIVOS]</a></div>
+            <div class="menu-item"><a href="../ezines/ezines.html">[EZINES]</a></div>
+            <div class="menu-item"><a href="../links.html">[SITES INTERESSANTES]</a></div>
+            
+            <hr class="menu-divider">
+            <div class="menu-item theme-switcher">
+                <span>TEMA:</span>
+                <div class="theme-switch-wrapper">
+                    <label class="theme-switch" for="theme-toggle">
+                        <div class="slider"></div>
+                    </label>
+                </div>
+            </div>
+        </nav>
+
+    <main class="content-area">
+
+        <section class='box toc-box'>
+            <h2 class="section-title">Índice (ToC)</h2>
+            <ul class="toc-list">
+                <li><a href='#Eletrônica'>Eletrônica</a></li>
+                <li><a href='#Sistema Digital'>Sistema Digital</a></li>
+                <li><a href='#Circuito digital :'>Circuito digital :</a></li>
+                <li><a href='#Portas logicas'>Portas logicas</a></li>
+                <li><a href='#Algebra booleana'>Algebra booleana</a></li>
+                <li><a href='#Circuitos logicos equivalentes'>Circuitos logicos equivalentes</a></li>
+                <li><a href='#Circuitos combinatórios'>Circuitos combinatórios</a></li>
+                <li><a href='#Circuitos Combinatorios aritméticos'>Circuitos Combinatorios aritméticos</a></li>
+                <li><a href='#Unidades logicas e aritméticas (ULA)'>Unidades logicas e aritméticas (ULA)</a></li>
+                <li><a href='#Circuitos Sequenciais'>Circuitos Sequenciais</a></li>
+                <li><a href='#Flip-Flops'>Flip-Flops</a></li>
+            </ul>
+        </section>
+
+        <section id='Eletrônica' class='box section-content'>
+            <h2 class="section-title">Eletrônica</h2>
+            <p>O que é a eletrônica , a eletrônica é a ciencia que estuda como controlar a eletricidade.</p>
+            <p>Dividi-se em :</p>
+            <p>Analógica e a Digital a eletronica digital utliza binarios enquanto a utiliza grandezas fisicas variaveis ou sinais variaveis por exemplo lâmpada ,radios.</p>
+            <p>Exemplo de um sinial analogico:</p>
+            <pre class="code-block diagram">   /\               /
+  /  \             /
+ /    \     /\    /
+       \   /  \  / 
+ \ /    \/
+  \/</pre>
+            <p>Exemplo de sinal digital:</p>
+            <pre class="code-block diagram">   ______      ______
+  |      |    |      |
+  |      |    |      |
+  |      |____|      |______</pre>
+        </section>
+        
+        <section id='Sistema Digital' class='box section-content'>
+            <h2 class="section-title">Sistema Digital</h2>
+            <p>Um sistema digital tem mais vantagens pois ele possui:</p>
+            <ul class="feature-list">
+                <li><span>Maior rapidez</span></li>
+                <li><span>Menor custo</span></li>
+                <li><span>Grande capacidade de processamento</span></li>
+                <li><span>Maior capitação de sinais</span></li>
+                <li><span>Facil manuseio</span></li>
+                <li><span>Maior imunidade a ruidos</span></li>
+                <li><span>Maior confiabilidade</span></li>
+            </ul>
+        </section>
+
+        <section id='Circuito digital :' class='box section-content'>
+            <h2 class="section-title">Circuito digital :</h2>
+            <p>São circuitos eletronicos que utilizam sinais digitais</p>
+            <p>São formados pro blocos lógicos</p>
+            <p>Os blocos lógicos são formados por portas logicas</p>
+            <p>E portas logicas utilizam a logica booleana para funcionar</p>
+            <p>Circuitos digitais se dividem em :</p>
+            <p>Circuitos combinatórios</p>
+            <ul>
+                <li><span>Cada saida depende apenas das combinações de entrada ou seja são circuitos sem realimentação .</span></li>
+            </ul>
+            <p>Circuitos Sequenciais</p>
+            <p>Este circuito não depende apenas das combinações de entrada mais também das sequencias das variaveis do estado do sistema</p>
+            <p>Circuitos digitais utilizam o sistema de numeração binario que é composto de 0 e 1 apenas é utilizado a base 2 para representação cientifica por exemplo:</p>
+            <pre class="code-block"><code>2 elevado a 1 = 2
+2 elevado a 2 = 4 
+2 elevado a 3 = 8 
+2 elevado a 4 = 16
+2 elevado a 5 = 32</code></pre>
+            <p>Os microprocessadores percebem somente sinais elétricos, distinguindo-os em dois níveis de voltagem que são alto e baixo representados por H de HIGH e L de LOW.</p>
+            <p>Portanto, qualquer comunicação com o microprocessador pode ser reduzida exclusivamente a esses dois sinais, asociando-se H com o bit 1 e L com o bit 0 , agora isto seria apenas 1 bit apareceu a necessidade de utilizar multiplos bits por exemplo nosso computador hj em dia utiliza bytes que são cadeias com 8 bits ou seja 00000000.</p>
+            <p>Como um byte é representado por 8 bits ele é consequentemente 2 elevado a 8 ou seja 256 isto quer dizer que um byte por representar 256 valores diferentes que vão de 0 a 255.</p>
+            <p>Agora para se transformar numeros decimais em binarios é bem simples por exemplo vamos fazer o seguinte pra facilitar como o computador usa 8 bits iremos pegar a base 2 e fazer sua elevação até chegar em 256 ficando:</p>
+            <pre class="code-block"><code>256 128 64 32 16 8 4 2 </code></pre>
+            <p>Agora imagine que vc queria transformar o numero 328 em binario o que vc fará é o seguinte somara vc colocara 0 pra off e 1 pra on ou seja :</p>
+            <pre class="code-block"><code>256 + 64 + 8 = 328</code></pre>
+            <p>ou seja para escrever 328 em binario ficaria da seguinte maneira:</p>
+            <pre class="code-block"><code>256 128 64 32 16 8 4 2 
+1   0   1  0 0  1 0 0 &lt;--- 328 em binario :)</code></pre>
+            <p>O seu raciocinio precisa ser o seguinte por exemplo 328 cabe dentro de 256 se sim vc coloca 1 se não vc coloca 0 como cabe vc coloca 1 agora o numero mudou o que vc precisa fazer é o seguinte:</p>
+            <pre class="code-block"><code>328 - 256 = 72</code></pre>
+            <p>Ou seja o numero ficou 72 agora então vc verifica 128 cabe em 72 não então é 0 cabe em 64 sim então você coloca 1 e faz o mesmo esquema :</p>
+            <pre class="code-block"><code>72 - 64 = 8* Agora ficando 32 cabe em 8 nao então coloca 0 , 16 cabe me 8 não então coloca 0 e por fim 8 cabe em 8 sim ae vc faz o seguinte:
+    *8-8 =0 &lt;--- quando chegou no zero terminou ;) tudo que tiver atraz fica com 0 pq 0 vai caber só no 0 de novo
+resultado = 10100100</code></pre>
+            <p>Todo dispositivo computacional são consequentemente dispositivos digitais ou seja são compostos por circuitos logicos digitais e consequentemente por portas logicas.</p>
+        </section>
+
+        <section id='Portas logicas' class='box section-content'>
+            <h2 class="section-title">Portas logicas</h2>
+            <ul>
+                <li><span>São os elementos basicos de um circuito digital</span></li>
+                <li><span>Tem a função de controlar o fluxo digital</span></li>
+                <li><span>Depende do valor de entrada para gerar um valor de saida</span></li>
+                <li><span>CPU, memorias, interfaces com entrada e saida todas usam portas logicas</span></li>
+            </ul>
+        </section>
+
+        <section id='Algebra booleana' class='box section-content'>
+            <h2 class="section-title">Algebra booleana</h2>
+            <p>É utilizada para modelar operações logicas</p>
+            <p>Cada porta logica utiliza uma operação logica</p>
+            <p>Exemplo de algebra booleana:</p>
+            <pre class="code-block diagram">          _______
+ A ------|       |
+         |logica |
+ B ------|digital|-------X
+         |       |
+ C ------|_______|
+ 
+  X = a + b . c</pre>
+            <p>Operações logicas:</p>
+            <pre class="code-block"><code> 
+  Porta and(e) = . 
+  Porta or (ou) = +      ___
+  Porta not (inversor) =     ___  ou ' barra em cima ou apostrofro
+  Porta nand (not e and) = ___     ou ' barra em cima ou apostrofro
+  Porta nor ( not e or ) =       ou 0+ &lt;-- circulo com + dentro
+  Porta xor (or exclusivo) =</code></pre>
+            <pre class="code-block diagram">Simbolicamente
+          ______                               ______
+  A ----|      \                     A----\     \                     A----|\
+        |       |---- x &lt;-- And          |      |----x &lt;--- or        | \O---X &lt;--- not
+  B ----|______/                     B----/______/                     B----| /
+                                                                            |/
+                                                     
+          ______                               ______                             ______           
+  A ----|      \                     A----\     \                     A----\\     \
+        |       |0---- x &lt;-- nand        |      |----x &lt;--- nor       ||      |---X &lt;--- xor
+  B ----|______/                     B----/______/                     B----//_____/</code></pre>
+            <p>Exemplos:</p>
+            <pre class="code-block"><code>And --&gt; A.B = C
+      Or ---&gt; __ A + B = C
+      Not ---&gt; A  OU A'
+      NAND ---&gt; (A+B)'
+      XOR ---&gt; ( A 0+ B ) </code></pre>
+            <p>Para conseguir entender as operaçoes logicas vc precisa antes entender da tabela verdade: </p>
+            <p>A tabela verdade consiste em todas as possibilidades combinatorias de uma entrada produzindo um resultados de saida.</p>
+            <p>Estas variaveis possuem só duas possibilidades por exemplo:</p>
+            <pre class="code-block"><code>Ligado ou Desligado / Acesso ou apagado / Verdadeiro ou Falso</code></pre>
+            <p>Cada operação logica possui uma tabela verdade exemplo:</p>
+            <pre class="code-block truth-table">   Not         NAND         NOR         AND         OR         XOR         XNOR
+  A - x     A - B - X    A - B - X    A - B - X    A - B - X    A - B - X     A - B - X 
+  0 - 1     0 - 0 - 1    0 - 0 - 1    0 - 0 - 0    0 - 0 - 0    0 - 0 - 0     0 - 0 - 1 
+  1 - 0     0 - 1 - 1    0 - 1 - 0    0 - 1 - 0    0 - 1 - 1    0 - 1 - 1     0 - 1 - 0 
+            1 - 0 - 1    1 - 0 - 0    1 - 0 - 0    1 - 0 - 1    1 - 0 - 1     1 - 0 - 0 
+            1 - 1 - 0    1 - 1 - 0    1 - 1 - 1    1 - 1 - 1    1 - 1 - 0     1 - 1 - 1 </pre>
+        </section>
+
+        <section id='Circuitos logicos equivalentes' class='box section-content'>
+            <h2 class="section-title">Circuitos logicos equivalentes</h2>
+            <p>Possuem funçoes booleanas diferentes mas o mesmo resultado na saida exemplo:</p>
+            <pre class="code-block diagram">          ____                         
+ A --.---|    \____     ____
+ B __|___|____/    |____\    \_____
+   |           _______/___/                    
+   |   ____  |
+   |___|    \_|
+ C ______|____/
+                                    ____
+ A ---------------------------------|    \_____
+       _____         ________________|____/
+ B _____\     \_____|
+ C _____/____/                                    </pre>
+            <p>As portas logicas geralmente são agrupadas em circuitos logicos e encapsulados em circuitos integrados conhecidos como CI e vulgarmente como CHIPS.</p>
+            <ul class="chip-list">
+                <li><span>SSI (SMALL SCALE INTEGRATED) : 1 A 10 portas</span></li>
+                <li><span>MSI ( MEDIUM SCALE INTEGRATED): 10 A 100 portas</span></li>
+                <li><span>LSI ( LARGE SCALE INTEGRATED): 100 A 100.000 portas</span></li>
+                <li><span>VLSI ( VERY LARGE SCALE INTEGRATED):  &gt; 100.000 portas</span></li>
+            </ul>
+        </section>
+
+        <section id='Circuitos combinatórios' class='box section-content'>
+            <h2 class="section-title">Circuitos combinatórios</h2>
+            <p>Multiplexador ou seletor: </p>
+            <ul class="mux-demux-list">
+                <li><span>1 - seleciona uma das varias entrada e gera uma saida.</span></li>
+                <li><span>2 - tem varias entradas mais só uma saida.</span></li>
+                <li><span>3 - contem  2 elevado a n entrada de dados , n entradas de controle e uma saida.</span></li>
+                <li><span>4 - entradas de controle selecionam a entrada de dados que será enviada para a saida.</span></li>
+            </ul>
+            <p>Demultiplexador: </p>
+            <ul class="mux-demux-list">
+                <li><span>1 - seleciona uma dentre varias saidas.</span></li>
+                <li><span>2 - inverso ao multiplexador </span></li>
+            </ul>
+            <p>Codificador e decodificador: </p>
+            <ul class="coder-decoder-list">
+                <li><span>1 - codificam e decodificam bits.</span></li>
+                <li><span>2 - recebe na entrada um numero de n bits utilizando-os para selecionar exatamente uma de suas 2 elevado a n entradas.</span></li>
+                <li><span>3 - uma aplicação tipica do decodificador é o endereçamento de partes de uma memoria.</span></li>
+                <li><span>4 - sua saida depende apenas da combinação de entrada.</span></li>
+            </ul>
+            <p>Comparadores: comparam bits de entrada;</p>
+            <ul class="comparator-list">
+                <li><span>1 - serve para comparação de 2 palavras colocadas na sua entrada.</span></li>
+                <li><span>2 - quando as palavras são iguais sua saida é 1.</span></li>
+                <li><span>3 - quando são diferentes a saida é igual a 0.</span></li>
+                <li><span>4 - são usados principalmente para executar instruções condicionais do tipo if , intruções de loop do tipo while e for.</span></li>
+            </ul>
+            <p>Arranjo Logico programavel;</p>
+            <p>Aritmeticos: somadores e deslocadores;</p>
+            <p>Matrizes logicas programaveis:</p>
+            <ul class="pla-list">
+                <li><span>Uma matriz logica programavel tambem conhecida como chip PLA (Programable Logic Array) , serve para programação de circuitos genericos.</span></li>
+                <li><span>Implementação de funções arbitrárias a partir de suas tabelas verdades.</span></li>
+                <li><span>A matriz logica é programada, de acordo com a função desejada , queimando-se , com alta tensão , alguns dos fusiveis da matriz original.</span></li>
+            </ul>
+        </section>
+
+        <section id='Circuitos Combinatorios aritméticos' class='box section-content'>
+            <h2 class="section-title">Circuitos Combinatorios aritméticos</h2>
+            <p>Deslocador:</p>
+            <ul class="shifter-list">
+                <li><span>1 - tem um conjunto n de linhas de entrada e n linhas de saida e 1 linha de controle.</span></li>
+                <li><span>2 - os valores colocados nas linhas de entrada são enviados para as linhas de saida e deslocados de 1 bit , para a direita ou para a esquerda , dependendo do valor da linha de controle estar em 1 ou 0 respectivamente.</span></li>
+                <li><span>3 - utilizando para conversão paralelo serial , inversão de numeros , multiplicação e divisão .</span></li>
+            </ul>
+            <p>Somador:</p>
+            <ul class="adder-list">
+                <li><span>Meio somador = realiza a soma de duas entradas A e B gerando , como saida , o valor da soma e de um bit de transporte  ( o "VAI 1" da soma ).</span></li>
+                <li><span>Somador completo = realiza a soma de dua entradas A e B com um bit de transporte de entrada , o "VEM 1" da soma. Gera como saída o valor da soma e de um bit de transporte ( o "vai 1" da soma ) .</span></li>
+            </ul>
+        </section>
+
+        <section id='Unidades logicas e aritméticas (ULA)' class='box section-content'>
+            <h2 class="section-title">Unidades logicas e aritméticas (ULA)</h2>
+            <ul>
+                <li><span>São circuitos capazes de efetuar operações aritméticas sobre bits , como soma ,divisão ,multiplicação , divisão ,etc e logicas como comparações entre variaveis.</span></li>
+                <li><span>Estão presentes nos processadores.</span></li>
+                <li><span>Esse bloco logico é composto pela combinação de alguns circuitos combinatórios</span></li>
+            </ul>
+        </section>
+
+        <section id='Circuitos Sequenciais' class='box section-content'>
+            <h2 class="section-title">Circuitos Sequenciais</h2>
+            <ul>
+                <li><span>É composto por um circuito combinacional e elemento de memoria.</span></li>
+                <li><span>Os elementos de memoria são circuitos capazes de armazenar informação codificada em binario.</span></li>
+                <li><span>Podem ser divididos em 2 tipo conforme o comportamento temporal dos seus sinais:</span></li>
+                <li><span>Sincronos:</span></li>
+                <ul>
+                    <li><span>Dependem do sinal de relogio (clock).</span></li>
+                </ul>
+                <li><span>Assincronos:</span></li>
+                <ul>
+                    <li><span>Dependem da ordem segundo a qual as entradas mudam</span></li>
+                    <li><span>Formam as memorias , componente essencial de todo sistema computacional .</span></li>
+                    <li><span>Memorias armazenam tanto dados quanto instruções.</span></li>
+                    <li><span>Podem ser constituidas a partir de portas NOR e NAND.</span></li>
+                </ul>
+            </ul>
+        </section>
+
+        <section id='Flip-Flops' class='box section-content'>
+            <h2 class="section-title">Flip-Flops</h2>
+            <ul>
+                <li><span>Os elementos de memoria utilizados nos circuitos sequenciais síncronos são demoniados flip-flops.</span></li>
+                <li><span>Um flip-flop é um circuito digital que possui duas entradas e duas saidas e é capaz de armazenar um bit de informação.</span></li>
+                <li><span>Desde que devidamente alimentado com energia , um flip-flop pode manter indefinidamente um estado ,até que os sinais de entrada assumam uma configuração tal que o façam mudar de estado.</span></li>
+                <li><span>OS tipos de flip-flops são denominados latches.</span></li>
+                <li><span>Os latches mais comuns são : Latch RS, Latch RS controlado e o Latch D.</span></li>
+            </ul>
+        </section>
+        
+    </main>
+
+</div>
+</body>
+
+<!-- Mirrored from f3l1p3.neocities.org/arquivos/arquiteturadecomputadores by HTTrack Website Copier/3.x [XR&CO'2014], Sun, 05 Oct 2025 19:28:12 GMT -->
+</html>

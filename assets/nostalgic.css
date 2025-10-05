@@ -1,0 +1,110 @@
+/*
+    NOSTALGIC.CSS - VERSÃO FINAL COM TODAS AS CORREÇÕES ACUMULADAS
+*/
+
+/* ======== VARIÁVEIS E LÓGICA DO TEMA ======== */
+/* TEMA PADRÃO: HACKER (Escuro) - Versão Suave e Confortável */
+:root {
+    --color-bg-main: #000000;      /* Fundo cinza-carvão, menos agressivo que o preto puro */
+    --color-text-main: #a9d4a9;      /* Verde suave e dessaturado, confortável para ler */
+    --color-text-secondary: #e0e0e0; /* Títulos e links em branco-suave para um contraste claro e limpo */
+    --color-border: #3a4a3a;        /* Borda num tom de verde escuro */
+    --color-box-bg: #000000;        /* Fundo das caixas ligeiramente mais claro */
+    --color-code-block-bg: #252525;  /* Fundo dos blocos de código */
+    --font-pixel: '8-bit-Limit-BRK', monospace, sans-serif;
+    --font-console: monospace;
+    --shadow-effect: none;            /* Efeito de brilho REMOVIDO */
+    --border-style-old: 1px solid var(--color-border);
+}
+
+#theme-toggle:checked ~ .site-wrapper {
+    --color-bg-main: #FFFFFF;
+    --color-text-main: #000000;
+    --color-text-secondary: #0056b3;
+    --color-border: #cccccc;
+    --color-box-bg: #f8f9fa;
+    --color-code-block-bg: #f0f0f0;
+    --font-pixel: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+    --shadow-effect: none;
+}
+
+/* ======== ESTILOS DO INTERRUPTOR ======== */
+.theme-switcher { display: flex; align-items: center; gap: 10px; }
+.theme-switch-wrapper { display: flex; align-items: center; }
+.theme-switch { position: relative; display: inline-block; width: 50px; height: 24px; }
+.theme-switch input { opacity: 0; width: 0; height: 0; }
+.slider { position: absolute; cursor: pointer; top: 0; left: 0; right: 0; bottom: 0; background-color: #333; transition: .4s; border-radius: 24px; border: 1px solid var(--color-border); }
+.slider:before { position: absolute; content: ""; height: 16px; width: 16px; left: 4px; bottom: 3px; background-color: var(--color-text-main); transition: .4s; border-radius: 50%; }
+input:checked + .slider { background-color: #ccc; border-color: #888; }
+input:checked + .slider:before { background-color: #0056b3; transform: translateX(26px); }
+
+/* ======== RESET E ESTILOS GERAIS ======== */
+* { margin: 0; padding: 0; box-sizing: border-box; }
+
+html, body {
+    overflow-wrap: break-word;
+    word-wrap: break-word;
+    word-break: break-word;
+}
+
+body {
+    background-color: #000; /* Fundo base sempre preto */
+}
+
+.site-wrapper {
+    background-color:#000000;
+    min-height: 100vh; /* CORREÇÃO CRÍTICA: Garante que o wrapper cubra sempre o fundo preto do body */
+    color: var(--color-text-main);
+    font-family: var(--font-pixel);
+    text-align: center; margin: 0 auto; max-width: 960px;
+    letter-spacing: 1px; font-size: 16px; padding: 20px;
+    line-height: 1.6; text-shadow: var(--shadow-effect);
+    transition: background-color 0.3s, color 0.3s;
+}
+
+.content-area {
+    width: 100%;
+    margin: 20px auto;
+    padding: 10px;
+}
+
+/* ======== CABEÇALHO E NAVEGAÇÃO ======== */
+.site-header, .menu-bar, .box {
+    border: var(--border-style-old);
+    background-color: var(--color-box-bg);
+    box-shadow: var(--shadow-effect);
+    margin-bottom: 30px;
+    padding: 15px;
+}
+.main-title { font-size: 2.8rem; color: var(--color-text-secondary); text-shadow: var(--shadow-effect); margin-bottom: 10px; }
+.subtitle { font-size: 1.2rem; color: var(--color-text-main); text-shadow: var(--shadow-effect); }
+.menu-bar { display: flex; flex-wrap: wrap; justify-content: center; align-items: center; padding: 10px 0; }
+.menu-item { padding: 0 15px; }
+.menu-item a { color: var(--color-text-main); text-decoration: none; font-weight: bold; font-size: 1.1rem; }
+.menu-divider { border: none; border-top: 1px dashed var(--color-border); width: 80%; margin: 5px auto; }
+
+/* ======== CONTEÚDO ======== */
+.box { text-align: left; }
+.section-title { font-size: 1.8rem; color: var(--color-text-secondary); text-align: center; margin: 15px 0 20px; padding-bottom: 5px; border-bottom: 1px dashed var(--border); }
+p { font-size: 1rem; margin: 12px 0; text-align: left; }
+ul, ol { margin: 12px 0 12px 25px; padding: 0; }
+li { margin: 6px 0; font-size: 1rem; }
+a { color: var(--color-text-secondary); text-decoration: none; }
+strong { font-weight: bold; }
+#theme-toggle:checked ~ .site-wrapper strong { background: none; color: inherit; border: none; padding: 0; }
+.code-block { display: block; background-color: var(--color-code-block-bg); color: var(--color-text-main); font-family: var(--font-console); padding: 15px; border: 1px dashed var(--border); overflow-x: auto; margin: 20px 0; text-align: left; white-space: pre; }
+
+/* ======== IMAGENS ======== */
+img {
+    max-width: 100%;
+    height: auto;
+    border: var(--border-style-old);
+    box-shadow: var(--shadow-effect);
+}
+
+/* ======== RESPONSIVIDADE ======== */
+@media (max-width: 768px) {
+    .site-wrapper { font-size: 14px; }
+    .main-title { font-size: 2rem; }
+    .menu-bar { flex-direction: column; }
+}

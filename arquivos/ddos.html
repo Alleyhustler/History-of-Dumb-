@@ -1,0 +1,96 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+
+<!-- Mirrored from f3l1p3.neocities.org/arquivos/ddos by HTTrack Website Copier/3.x [XR&CO'2014], Sun, 05 Oct 2025 19:28:15 GMT -->
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Análise de Ataques DDoS</title>
+    <link href="../favicon.ico" rel="icon" type="image/x-icon" />
+    <link id="theme-stylesheet" href="../assets/nostalgic.css" rel="stylesheet" type="text/css" media="all">
+</head>
+
+<body>
+
+    <input type="checkbox" id="theme-toggle" style="display: none;"/>
+
+    <div class="site-wrapper">
+
+        <header class="site-header">
+            <h1 class="main-title">Ataques DDoS</h1>
+            <p class="subtitle">Análise de Negação de Serviço Distribuído</p>
+        </header>
+
+        <nav class='menu-bar'>
+            <div class="menu-item"><a href="../index.html">[MENU]</a></div>
+            <div class="menu-item"><a href="../sobre.html">[Sobre o FEP]</a></div>
+            <div class="menu-item"><a href="arquivos.html">[Arquivos]</a></div>
+            <div class="menu-item"><a href="../ezines/ezines.html">[Ezines]</a></div>
+            <div class="menu-item"><a href="../links.html">[Sites Interessantes]</a></div>
+            <div class="menu-item theme-switcher">
+                <label for="theme-toggle" style="cursor: pointer;">[MODO VISUAL]</label>
+            </div>
+        </nav>
+
+        <main class="content-area">
+
+            <section class="box">
+                <h2 class="section-title">Índice</h2>
+                <ul>
+                    <li><a href='#Ataques DDOS'>Ataques DDoS: Conceitos</a></li>
+                    <li><a href='#Anti-ddos'>Sistemas Anti-DDoS</a></li>
+                    <li><a href='#saturar-link'>Estratégia: Saturar o Link do Servidor</a></li>
+                    <li><a href='#esgotar-servico'>Estratégia: Esgotar os Serviços do Servidor</a></li>
+                </ul>
+            </section>
+
+            <section id='Ataques DDOS' class='box'>
+                <h2 class="section-title">Ataques DDoS: Conceitos</h2>
+                <p>Os métodos de ataque baseados em pacotes UDP e SYN são os mais utilizados. Existem duas estratégias fundamentais:</p>
+                <ol>
+                    <li><strong>Saturar o link do servidor:</strong> O objetivo é esgotar a largura de banda (a capacidade de conexão) do servidor. Neste método, a capacidade de upload e o poder de processamento das máquinas atacantes são os fatores mais importantes.</li>
+                    <li><strong>Esgotar os serviços do servidor:</strong> Considerado um método mais eficiente, o ataque visa sobrecarregar os serviços específicos do servidor (como o servidor web ou de banco de dados), excedendo o número de processos ou conexões simultâneas que ele consegue gerir.</li>
+                </ol>
+            </section>
+
+            <section id='Anti-ddos' class='box'>
+                <h2 class="section-title">Sistemas Anti-DDoS</h2>
+                <p>A lógica básica de um sistema anti-DDoS pode ser simplificada da seguinte forma:</p>
+                <pre class="code-block"><code>se (um IP conectar X vezes em Y segundos com a mesma requisição) então BLOQUEAR;</code></pre>
+                <pre class="code-block"><code>se (um IP conectar X vezes em Y segundos) então BLOQUEAR;</code></pre>
+                <p>Contornar um serviço anti-DDoS é mais complicado. Geralmente, são necessárias <em>botnets</em> (redes de computadores infetados) para um ataque ser bem-sucedido. Isso ocorre porque os sistemas anti-DDoS são eficazes contra ataques de poucas fontes, então os atacantes usam milhares de IPs diferentes para contornar os filtros, tentando simular o tráfego de utilizadores normais.</p>
+                <p>Protocolos como ICMP e SYN são, muitas vezes, usados para completar outros protocolos (por exemplo, SYN para completar uma conexão TCP). Se um servidor recebe muitos pacotes SYN ou ICMP que não conseguem autenticar, o tráfego TCP/UDP é analisado, e o sistema pode identificar um ataque DDoS, bloqueando o tráfego suspeito.</p>
+                <p>Pois são considerados comportamentos atípicos.</p>
+                <p>Para contornar as defesas mais básicas, uma botnet pode ser programada para enviar uma requisição a cada 10 ou 15 segundos por cada máquina infetada. Desta forma, o sistema anti-DDoS pode interpretar o tráfego como sendo de utilizadores legítimos. Apenas uma análise humana ou um sistema mais avançado conseguiria filtrar este tipo de ataque lento.</p>
+                <p>O filtro anti-DDoS, na realidade, funciona como um proxy: ele coloca o seu próprio IP à frente do servidor e encaminha apenas o tráfego considerado legítimo. Um ataque massivo, mesmo que mitigado, pode gerar um custo financeiro enorme para o dono do site, devido ao alto consumo de largura de banda. Se um atacante conseguir descobrir o IP real do servidor, ele pode contornar ("bypass") o filtro anti-DDoS, tornando a proteção inútil. Por isso, um mapeamento detalhado da rede é sempre uma prioridade para os atacantes.</p>
+            </section>
+
+            <section id='saturar-link' class='box'>
+                <h2 class="section-title">Estratégia: Saturar o Link do Servidor</h2>
+                <p>Ferramentas historicamente usadas para este fim:</p>
+                <pre class="code-block"><code>T50 e G3M</code></pre>
+                <p>Estas ferramentas utilizam vários protocolos (SYN, UDP, ICMP, etc.) para gerar um grande volume de tráfego.</p>
+                <p>Para este método, é necessária uma alta capacidade de UPLOAD por parte das máquinas atacantes para conseguir enviar um volume massivo de dados de uma só vez.</p>
+                <p>É considerado um método menos sofisticado, pois são ataques mais diretos e "barulhentos", com milhares de requisições por segundo a partir de poucos IPs. Os filtros anti-DDoS detetam facilmente este padrão, usando a regra de "X requisições em Y tempo".</p>
+                <p>Por exemplo: um script executando um loop de 1 a 1000, numa máquina robusta, poderia tentar enviar 500 MB ou 1 GB de pacotes por segundo. O servidor atacado teria problemas, pois necessitaria de uma ligação capaz de receber e processar todo esse volume de uma vez.</p>
+                <p>Apenas com uma botnet de muitas máquinas é que este objetivo se torna alcançável contra alvos bem protegidos.</p>
+            </section>
+
+            <section id='esgotar-servico' class='box'>
+                <h2 class="section-title">Estratégia: Esgotar os Serviços do Servidor</h2>
+                <p>Ferramentas historicamente usadas para ocupar os recursos do servidor:</p>
+                <pre class="code-block"><code> Slowloris </code></pre>
+                <p>Para este método, é necessário estudar uma forma de sobrecarregar ao máximo o servidor com o menor esforço possível.</p>
+                <p>Exemplo: encontrar um ficheiro muito grande no site (uma imagem em alta resolução, um vídeo, um PDF) e, de seguida, instruir uma botnet a iniciar o download desse ficheiro a cada 10 ou 15 segundos. O filtro pode não detetar o ataque, pois as conexões são iniciadas com intervalos longos, parecendo ser de um utilizador normal.</p>
+                <p>A estratégia consiste em identificar uma parte do site que consuma muitos recursos (CPU ou memória). Se um servidor web como o Apache suporta, por exemplo, 1000 conexões simultâneas, basta ter um número de máquinas na botnet que exceda esse limite para o deixar offline.</p>
+                <p><strong>Um IP diferente é uma arma mais forte do que uma única máquina com muita largura de banda.</strong></p>
+                <pre class="code-block"><code>Exemplo: um servidor web Apache pode ter hardware e conexão de ponta, mas se o software do Apache só estiver configurado para suportar 1000 conexões simultâneas, esse será o seu ponto fraco.</code></pre>
+            </section>
+
+        </main>
+
+    </div> 
+</body>
+
+<!-- Mirrored from f3l1p3.neocities.org/arquivos/ddos by HTTrack Website Copier/3.x [XR&CO'2014], Sun, 05 Oct 2025 19:28:16 GMT -->
+</html>
